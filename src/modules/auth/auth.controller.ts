@@ -39,6 +39,15 @@ const resetPasswordSchema = z.object({
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  async self(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user = await this.authService.self(req.user!.id)
+      res.json(success(user, "User fetched"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const parsed = registerSchema.safeParse(req.body)

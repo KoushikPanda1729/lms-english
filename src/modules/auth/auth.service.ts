@@ -152,6 +152,15 @@ export class AuthService {
     )
   }
 
+  // ─── Self ──────────────────────────────────────────────────────────────────
+
+  async self(userId: string): Promise<Omit<User, "passwordHash">> {
+    const user = await this.userRepo.findOne({ where: { id: userId } })
+    if (!user) throw new UnauthorizedError("User not found")
+    const { passwordHash: _pw, ...safe } = user
+    return safe
+  }
+
   // ─── Private: issue token pair ─────────────────────────────────────────────
 
   private async issueTokens(user: User, deviceId: string, platform: Platform): Promise<TokenPair> {
