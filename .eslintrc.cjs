@@ -12,6 +12,7 @@ module.exports = {
     'prettier',
   ],
   root: true,
+  ignorePatterns: ['dist/', 'node_modules/', 'scripts/'],
   env: {
     node: true,
     es2020: true,
