@@ -11,6 +11,7 @@ import { signAccessToken } from "./jwt.util"
 import { ConflictError, UnauthorizedError, ValidationError } from "../../shared/errors"
 import { Config } from "../../config/config"
 import type { RegisterParams, LoginParams, TokenPair } from "./interfaces/auth.interface"
+import logger from "../../config/logger"
 
 export class AuthService {
   constructor(
@@ -106,10 +107,11 @@ export class AuthService {
     )
 
     // TODO: send email — emailService.sendPasswordReset(email, plainToken)
-    // Dev only: log to console
+    // Dev only: log reset link to console
     if (Config.NODE_ENV === "development") {
-      console.log(`\n🔑  Password reset token for ${email}:`)
-      console.log(`    ${Config.APP_URL}/reset-password?token=${plainToken}\n`)
+      logger.debug(
+        `Password reset link for ${email}: ${Config.APP_URL}/reset-password?token=${plainToken}`,
+      )
     }
   }
 
