@@ -79,7 +79,10 @@ export class UserController {
 
   async getPublicProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id
+      const id = String(req.params.id)
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (!uuidRegex.test(id)) throw new ValidationError("Invalid user ID")
+
       const profile = await this.userService.getPublicProfile(id)
       res.json(success(profile, "Profile fetched"))
     } catch (err) {

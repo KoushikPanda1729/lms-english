@@ -3,6 +3,7 @@ import { Repository } from "typeorm"
 import { Profile } from "../../entities/Profile.entity"
 import { StorageService } from "../../services/storage.service"
 import { NotFoundError, ValidationError } from "../../shared/errors"
+import logger from "../../config/logger"
 import type { UpdateProfileParams } from "./interfaces/user.interface"
 
 export class UserService {
@@ -24,11 +25,6 @@ export class UserService {
   async updateMe(userId: string, data: UpdateProfileParams): Promise<Profile> {
     const profile = await this.getMe(userId)
 
-    if (data.username && data.username !== profile.username) {
-      const taken = await this.profileRepo.findOne({ where: { username: data.username } })
-      if (taken) throw new ValidationError("Username already taken")
-    }
-
     Object.assign(profile, {
       ...(data.username !== undefined && { username: data.username }),
       ...(data.displayName !== undefined && { displayName: data.displayName }),
@@ -40,7 +36,16 @@ export class UserService {
       ...(data.timezone !== undefined && { timezone: data.timezone }),
     })
 
-    return this.profileRepo.save(profile)
+    // Let DB unique constraint handle race condition — catch and convert to user-friendly error
+    try {
+      return await this.profileRepo.save(profile)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : ""
+      if (msg.includes("UQ_") || msg.includes("unique")) {
+        throw new ValidationError("Username already taken")
+      }
+      throw err
+    }
   }
 
   // ─── Upload avatar ─────────────────────────────────────────────────────────
@@ -64,10 +69,12 @@ export class UserService {
 
     const profile = await this.getMe(userId)
 
-    // Delete old avatar if exists
+    // Delete old avatar if exists — log but don't fail if delete errors
     if (profile.avatarUrl) {
       const oldKey = this.storageService.extractKey(profile.avatarUrl)
-      await this.storageService.delete(oldKey).catch(() => {})
+      await this.storageService.delete(oldKey).catch((err) => {
+        logger.warn("Failed to delete old avatar from storage", { key: oldKey, error: err })
+      })
     }
 
     const key = `avatars/${userId}/${Date.now()}.webp`
@@ -87,7 +94,9 @@ export class UserService {
     }
 
     const key = this.storageService.extractKey(profile.avatarUrl)
-    await this.storageService.delete(key).catch(() => {})
+    await this.storageService.delete(key).catch((err) => {
+      logger.warn("Failed to delete avatar from storage", { key, error: err })
+    })
 
     profile.avatarUrl = null
     return this.profileRepo.save(profile)
