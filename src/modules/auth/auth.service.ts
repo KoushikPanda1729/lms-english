@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt"
 import { v4 as uuidv4 } from "uuid"
 import { createHash } from "crypto"
-import { Repository } from "typeorm"
+import { DataSource, Repository } from "typeorm"
 import { User } from "../../entities/User.entity"
 import { RefreshToken } from "../../entities/RefreshToken.entity"
 import { PasswordResetToken } from "../../entities/PasswordResetToken.entity"
+import { Profile } from "../../entities/Profile.entity"
 import { UserRole, Platform } from "../../enums/index"
 import { signAccessToken } from "./jwt.util"
 import { OAuth2Client } from "google-auth-library"
@@ -25,6 +26,7 @@ export class AuthService {
     private readonly userRepo: Repository<User>,
     private readonly refreshTokenRepo: Repository<RefreshToken>,
     private readonly passwordResetTokenRepo: Repository<PasswordResetToken>,
+    private readonly dataSource: DataSource,
   ) {}
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
@@ -50,12 +52,17 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(params.password, 12)
 
-    const user = this.userRepo.create({
-      email: params.email,
-      passwordHash,
-      role: UserRole.STUDENT,
+    // Create user + profile in a single transaction
+    const user = await this.dataSource.manager.transaction(async (manager) => {
+      const u = manager.create(User, {
+        email: params.email,
+        passwordHash,
+        role: UserRole.STUDENT,
+      })
+      await manager.save(u)
+      await manager.save(manager.create(Profile, { userId: u.id }))
+      return u
     })
-    await this.userRepo.save(user)
 
     return this.issueTokens(user, params.deviceId, params.platform)
   }
@@ -181,16 +188,20 @@ export class AuthService {
         user.isVerified = true
       }
     } else {
-      // Auto-register new user
-      user = this.userRepo.create({
-        email,
-        googleId,
-        passwordHash: null,
-        role: UserRole.STUDENT,
-        isVerified: email_verified ?? true,
+      // Auto-register new user + create profile in one transaction
+      user = await this.dataSource.manager.transaction(async (manager) => {
+        const u = manager.create(User, {
+          email,
+          googleId,
+          passwordHash: null,
+          role: UserRole.STUDENT,
+          isVerified: email_verified ?? true,
+        })
+        await manager.save(u)
+        await manager.save(manager.create(Profile, { userId: u.id }))
+        logger.info(`New user registered via Google: ${email}`)
+        return u
       })
-      await this.userRepo.save(user)
-      logger.info(`New user registered via Google: ${email}`)
     }
 
     return this.issueTokens(user, params.deviceId, params.platform)
