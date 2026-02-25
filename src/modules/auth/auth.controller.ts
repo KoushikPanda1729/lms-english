@@ -5,7 +5,7 @@ import { Platform } from "../../enums/index"
 import { success } from "../../shared/response"
 import { ValidationError } from "../../shared/errors"
 import { Config } from "../../config/config"
-import { TokenPair } from "./interfaces/auth.interface"
+import type { TokenPair } from "./interfaces/auth.interface"
 
 // ─── Schemas ───────────────────────────────────────────────────────────────────
 

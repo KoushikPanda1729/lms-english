@@ -1,5 +1,6 @@
 import { Redis } from "ioredis"
 import { Config } from "./config"
+import logger from "./logger"
 
 let redisClient: Redis | null = null
 
@@ -13,7 +14,7 @@ export const createRedisClient = (): Redis => {
     retryStrategy: (times: number) => Math.min(times * 50, 2000),
   })
 
-  redisClient.on("connect", () => console.log("✅  Redis connected"))
+  redisClient.on("connect", () => logger.info("✅  Redis connected"))
   redisClient.on("error", (err: Error) => console.error("❌  Redis error:", err))
 
   return redisClient
