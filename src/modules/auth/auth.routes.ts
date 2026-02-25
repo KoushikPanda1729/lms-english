@@ -15,6 +15,7 @@ export function authRouter(controller: AuthController): Router {
   router.post("/logout", validateRefreshToken, (req, res, next) =>
     controller.logout(req, res, next),
   )
+  router.post("/google", (req, res, next) => controller.googleSignIn(req, res, next))
   router.post("/forgot-password", (req, res, next) => controller.forgotPassword(req, res, next))
   router.post("/reset-password", (req, res, next) => controller.resetPassword(req, res, next))
 

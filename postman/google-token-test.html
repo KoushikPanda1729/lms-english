@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Get Google ID Token</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body { font-family: monospace; padding: 40px; background: #1e1e1e; color: #ccc; }
+    h2 { color: #fff; }
+    #token-box {
+      margin-top: 20px;
+      padding: 16px;
+      background: #2d2d2d;
+      border-radius: 8px;
+      word-break: break-all;
+      display: none;
+    }
+    #token-box textarea {
+      width: 100%;
+      height: 120px;
+      background: #111;
+      color: #4fc3f7;
+      border: 1px solid #444;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    button.copy-btn {
+      margin-top: 8px;
+      padding: 8px 16px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    p { color: #aaa; }
+  </style>
+</head>
+<body>
+  <h2>Google Sign-In — Get ID Token for Postman</h2>
+  <p>Click the button below, sign in with your Google account, then copy the token into Postman.</p>
+
+  <!-- Replace with your actual Client ID -->
+  <div id="g_id_onload"
+    data-client_id="117841911684-g3pil4pulti5abr73qmt4vgdmfu7crn3.apps.googleusercontent.com"
+    data-callback="handleCredentialResponse"
+    data-auto_prompt="false">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <div id="token-box">
+    <p style="color:#4fc3f7; margin:0 0 8px">Your ID Token (copy this into Postman as <b>idToken</b>):</p>
+    <textarea id="token-output" readonly></textarea>
+    <button class="copy-btn" onclick="copyToken()">Copy Token</button>
+  </div>
+
+  <script>
+    function handleCredentialResponse(response) {
+      const box = document.getElementById('token-box')
+      const output = document.getElementById('token-output')
+      output.value = response.credential
+      box.style.display = 'block'
+    }
+
+    function copyToken() {
+      const output = document.getElementById('token-output')
+      output.select()
+      document.execCommand('copy')
+      alert('Token copied to clipboard!')
+    }
+  </script>
+</body>
+</html>

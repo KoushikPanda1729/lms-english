@@ -24,6 +24,12 @@ export interface TokenPair {
   }
 }
 
+export interface GoogleSignInParams {
+  idToken: string
+  deviceId: string
+  platform: Platform
+}
+
 export interface JwtPayload {
   sub: string
   email: string

@@ -7,9 +7,17 @@ import { RefreshToken } from "../../entities/RefreshToken.entity"
 import { PasswordResetToken } from "../../entities/PasswordResetToken.entity"
 import { UserRole, Platform } from "../../enums/index"
 import { signAccessToken } from "./jwt.util"
+import { OAuth2Client } from "google-auth-library"
 import { ConflictError, UnauthorizedError, ValidationError } from "../../shared/errors"
 import { Config } from "../../config/config"
-import type { RegisterParams, LoginParams, TokenPair } from "./interfaces/auth.interface"
+import type {
+  RegisterParams,
+  LoginParams,
+  TokenPair,
+  GoogleSignInParams,
+} from "./interfaces/auth.interface"
+
+const googleClient = new OAuth2Client(Config.GOOGLE_CLIENT_ID)
 import logger from "../../config/logger"
 
 export class AuthService {
@@ -60,6 +68,7 @@ export class AuthService {
     // Same error for wrong email and wrong password — prevent enumeration
     if (!user) throw new UnauthorizedError("Invalid credentials")
     if (user.isBanned) throw new UnauthorizedError("Account suspended")
+    if (!user.passwordHash) throw new UnauthorizedError("Please sign in with Google")
 
     const valid = await bcrypt.compare(params.password, user.passwordHash)
     if (!valid) throw new UnauthorizedError("Invalid credentials")
@@ -139,6 +148,52 @@ export class AuthService {
       { userId: resetToken.userId, revoked: false },
       { revoked: true, revokedAt: new Date() },
     )
+  }
+
+  // ─── Google Sign-In ────────────────────────────────────────────────────────
+
+  async googleSignIn(params: GoogleSignInParams): Promise<TokenPair> {
+    // Verify the idToken with Google
+    const ticket = await googleClient.verifyIdToken({
+      idToken: params.idToken,
+      audience: Config.GOOGLE_CLIENT_ID,
+    })
+
+    const payload = ticket.getPayload()
+    if (!payload || !payload.email) {
+      throw new UnauthorizedError("Invalid Google token")
+    }
+
+    const { sub: googleId, email, email_verified } = payload
+
+    // Find existing user by googleId or email
+    let user = await this.userRepo.findOne({
+      where: [{ googleId }, { email }],
+    })
+
+    if (user) {
+      if (user.isBanned) throw new UnauthorizedError("Account suspended")
+
+      // Link googleId if user registered with email/password before
+      if (!user.googleId) {
+        await this.userRepo.update(user.id, { googleId, isVerified: true })
+        user.googleId = googleId
+        user.isVerified = true
+      }
+    } else {
+      // Auto-register new user
+      user = this.userRepo.create({
+        email,
+        googleId,
+        passwordHash: null,
+        role: UserRole.STUDENT,
+        isVerified: email_verified ?? true,
+      })
+      await this.userRepo.save(user)
+      logger.info(`New user registered via Google: ${email}`)
+    }
+
+    return this.issueTokens(user, params.deviceId, params.platform)
   }
 
   // ─── Self ──────────────────────────────────────────────────────────────────

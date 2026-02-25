@@ -23,6 +23,12 @@ const loginSchema = z.object({
   platform: z.nativeEnum(Platform).default(Platform.WEB),
 })
 
+const googleSignInSchema = z.object({
+  idToken: z.string().min(1, "Google ID token is required"),
+  deviceId: z.string().default("web"),
+  platform: z.nativeEnum(Platform).default(Platform.WEB),
+})
+
 const forgotPasswordSchema = z.object({
   email: z.string().email("Invalid email"),
 })
@@ -116,6 +122,19 @@ export class AuthController {
       await this.authService.logout(req.refreshToken!.record)
       clearAuthCookies(res)
       res.json(success(null, "Logged out successfully"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  async googleSignIn(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = googleSignInSchema.safeParse(req.body)
+      if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
+
+      const result = await this.authService.googleSignIn(parsed.data)
+      setAuthCookies(res, result)
+      res.json(success(result, "Google sign-in successful"))
     } catch (err) {
       next(err)
     }

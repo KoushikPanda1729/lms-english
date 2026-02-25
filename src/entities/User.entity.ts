@@ -9,8 +9,11 @@ export class User {
   @Column({ unique: true })
   email!: string
 
-  @Column({ name: "password_hash" })
-  passwordHash!: string
+  @Column({ name: "password_hash", nullable: true, type: "varchar" })
+  passwordHash!: string | null
+
+  @Column({ name: "google_id", nullable: true, type: "varchar", unique: true })
+  googleId!: string | null
 
   @Column({ type: "enum", enum: UserRole, default: UserRole.STUDENT })
   role!: UserRole
