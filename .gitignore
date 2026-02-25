@@ -1,0 +1,16 @@
+node_modules/
+dist/
+
+# env files — commit only .env.example
+.env
+.env.development
+.env.production
+.env.test
+!.env.example
+
+# RSA keys — never commit private key
+keys/private.pem
+
+*.log
+.DS_Store
+coverage/
