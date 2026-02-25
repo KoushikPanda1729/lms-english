@@ -68,21 +68,9 @@ export class AuthService {
   }
 
   // ─── Refresh ───────────────────────────────────────────────────────────────
+  // Note: token is already validated by validateRefreshToken middleware
 
-  async refresh(plainToken: string): Promise<TokenPair> {
-    const tokenHash = this.hashToken(plainToken)
-
-    const stored = await this.refreshTokenRepo.findOne({
-      where: { tokenHash },
-      relations: ["user"],
-    })
-
-    if (!stored || stored.revoked || stored.expiresAt < new Date()) {
-      throw new UnauthorizedError("Invalid or expired refresh token")
-    }
-
-    if (stored.user.isBanned) throw new UnauthorizedError("Account suspended")
-
+  async refresh(stored: RefreshToken): Promise<TokenPair> {
     // Rotate — revoke old, issue new
     stored.revoked = true
     stored.revokedAt = new Date()
@@ -92,10 +80,10 @@ export class AuthService {
   }
 
   // ─── Logout ────────────────────────────────────────────────────────────────
+  // Note: token is already validated by validateRefreshToken middleware
 
-  async logout(plainToken: string): Promise<void> {
-    const tokenHash = this.hashToken(plainToken)
-    await this.refreshTokenRepo.update({ tokenHash }, { revoked: true, revokedAt: new Date() })
+  async logout(stored: RefreshToken): Promise<void> {
+    await this.refreshTokenRepo.update({ id: stored.id }, { revoked: true, revokedAt: new Date() })
   }
 
   // ─── Forgot password ───────────────────────────────────────────────────────

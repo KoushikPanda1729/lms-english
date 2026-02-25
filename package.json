@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/main.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development node --no-warnings --watch --loader ts-node/esm src/main.ts",
+    "dev": "cross-env NODE_ENV=development nodemon",
     "build": "tsc",
     "start": "cross-env NODE_ENV=production node dist/main.js",
     "lint": "eslint 'src/**/*.ts'",
@@ -50,6 +50,7 @@
     "eslint-config-prettier": "^9.1.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
+    "nodemon": "^3.1.14",
     "prettier": "^3.2.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.7.2",

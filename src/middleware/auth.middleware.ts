@@ -8,13 +8,21 @@ export async function authMiddleware(
   next: NextFunction,
 ): Promise<void> {
   try {
-    const authHeader = req.headers.authorization
+    let token: string | undefined
 
-    if (!authHeader?.startsWith("Bearer ")) {
-      throw new UnauthorizedError("Missing authorization header")
+    // Priority 1: Authorization header (mobile + web)
+    const authHeader = req.headers.authorization
+    if (authHeader?.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1]
     }
 
-    const token = authHeader.split(" ")[1]
+    // Priority 2: accessToken cookie (web fallback)
+    if (!token && req.cookies?.accessToken) {
+      token = req.cookies.accessToken as string
+    }
+
+    if (!token) throw new UnauthorizedError("Missing authorization")
+
     const payload = await verifyAccessToken(token)
 
     req.user = {

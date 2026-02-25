@@ -5,6 +5,7 @@ import { Platform } from "../../enums/index"
 import { success } from "../../shared/response"
 import { ValidationError } from "../../shared/errors"
 import { Config } from "../../config/config"
+import { TokenPair } from "./interfaces/auth.interface"
 
 // ─── Schemas ───────────────────────────────────────────────────────────────────
 
@@ -33,30 +34,29 @@ const resetPasswordSchema = z.object({
 
 // ─── Cookie helpers ────────────────────────────────────────────────────────────
 
-const COOKIE_NAME = "refreshToken"
+const IS_PROD = Config.NODE_ENV === "production"
+const REFRESH_MAX_AGE = 30 * 24 * 60 * 60 * 1000 // 30d
+const ACCESS_MAX_AGE = 15 * 60 * 1000 // 15m
 
-const COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000 // 30 days
-
-function setRefreshCookie(res: Response, token: string): void {
-  res.cookie(COOKIE_NAME, token, {
+function setAuthCookies(res: Response, tokens: TokenPair): void {
+  res.cookie("accessToken", tokens.accessToken, {
     httpOnly: true,
-    secure: Config.NODE_ENV === "production",
+    secure: IS_PROD,
     sameSite: "strict",
-    maxAge: COOKIE_MAX_AGE_MS,
+    maxAge: ACCESS_MAX_AGE,
+  })
+  res.cookie("refreshToken", tokens.refreshToken, {
+    httpOnly: true,
+    secure: IS_PROD,
+    sameSite: "strict",
+    maxAge: REFRESH_MAX_AGE,
   })
 }
 
-function clearRefreshCookie(res: Response): void {
-  res.clearCookie(COOKIE_NAME, {
-    httpOnly: true,
-    secure: Config.NODE_ENV === "production",
-    sameSite: "strict",
-  })
-}
-
-// Web sends via cookie, mobile sends via body — accept both
-function getRefreshToken(req: Request): string | undefined {
-  return (req.cookies?.[COOKIE_NAME] as string | undefined) ?? req.body?.refreshToken
+function clearAuthCookies(res: Response): void {
+  const opts = { httpOnly: true, secure: IS_PROD, sameSite: "strict" as const }
+  res.clearCookie("accessToken", opts)
+  res.clearCookie("refreshToken", opts)
 }
 
 // ─── Controller ────────────────────────────────────────────────────────────────
@@ -79,7 +79,7 @@ export class AuthController {
       if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
 
       const result = await this.authService.register(parsed.data)
-      setRefreshCookie(res, result.refreshToken)
+      setAuthCookies(res, result)
       res.status(201).json(success(result, "Registration successful"))
     } catch (err) {
       next(err)
@@ -92,31 +92,29 @@ export class AuthController {
       if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
 
       const result = await this.authService.login(parsed.data)
-      setRefreshCookie(res, result.refreshToken)
+      setAuthCookies(res, result)
       res.json(success(result, "Login successful"))
     } catch (err) {
       next(err)
     }
   }
 
+  // validateRefreshToken middleware already validated — record is on req.refreshToken
   async refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = getRefreshToken(req)
-      if (!token) throw new ValidationError("Refresh token is required")
-
-      const result = await this.authService.refresh(token)
-      setRefreshCookie(res, result.refreshToken)
+      const result = await this.authService.refresh(req.refreshToken!.record)
+      setAuthCookies(res, result)
       res.json(success(result, "Token refreshed"))
     } catch (err) {
       next(err)
     }
   }
 
+  // validateRefreshToken middleware already validated — record is on req.refreshToken
   async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const token = getRefreshToken(req)
-      if (token) await this.authService.logout(token)
-      clearRefreshCookie(res)
+      await this.authService.logout(req.refreshToken!.record)
+      clearAuthCookies(res)
       res.json(success(null, "Logged out successfully"))
     } catch (err) {
       next(err)
@@ -141,7 +139,7 @@ export class AuthController {
       if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
 
       await this.authService.resetPassword(parsed.data.token, parsed.data.newPassword)
-      clearRefreshCookie(res)
+      clearAuthCookies(res)
       res.json(success(null, "Password reset successfully"))
     } catch (err) {
       next(err)
