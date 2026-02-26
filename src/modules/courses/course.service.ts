@@ -1,0 +1,363 @@
+import { Repository } from "typeorm"
+import { Course } from "../../entities/Course.entity"
+import { Lesson } from "../../entities/Lesson.entity"
+import { UserCourseProgress } from "../../entities/UserCourseProgress.entity"
+import { UserLessonProgress } from "../../entities/UserLessonProgress.entity"
+import { EnglishLevel, LessonType } from "../../enums/index"
+import { NotFoundError, ForbiddenError, ConflictError } from "../../shared/errors"
+import { StorageService } from "../../services/storage.service"
+
+interface ListCoursesFilters {
+  level?: EnglishLevel
+  isPremium?: boolean
+  page: number
+  limit: number
+}
+
+interface CreateCourseDto {
+  title: string
+  description?: string | null
+  level?: EnglishLevel | null
+  isPremium?: boolean
+}
+
+interface UpdateCourseDto {
+  title?: string
+  description?: string | null
+  thumbnailUrl?: string | null
+  level?: EnglishLevel | null
+  isPremium?: boolean
+  isPublished?: boolean
+}
+
+interface CreateLessonDto {
+  title: string
+  type: LessonType
+  content?: string | null
+  videoUrl?: string | null
+  order?: number
+  durationMinutes?: number | null
+}
+
+interface UpdateLessonDto {
+  title?: string
+  type?: LessonType
+  content?: string | null
+  videoUrl?: string | null
+  order?: number
+  durationMinutes?: number | null
+}
+
+export class CourseService {
+  constructor(
+    private readonly courseRepo: Repository<Course>,
+    private readonly lessonRepo: Repository<Lesson>,
+    private readonly courseProgressRepo: Repository<UserCourseProgress>,
+    private readonly lessonProgressRepo: Repository<UserLessonProgress>,
+    private readonly storageService: StorageService,
+  ) {}
+
+  // ─── GET /courses ─────────────────────────────────────────────────────────────
+
+  async listCourses(
+    filters: ListCoursesFilters,
+    userId?: string,
+  ): Promise<{
+    courses: (Course & { enrolled: boolean })[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    const { page, limit, level, isPremium } = filters
+
+    const qb = this.courseRepo
+      .createQueryBuilder("c")
+      .where("c.isPublished = true")
+      .orderBy("c.createdAt", "DESC")
+      .skip((page - 1) * limit)
+      .take(limit)
+
+    if (level) qb.andWhere("c.level = :level", { level })
+    if (isPremium !== undefined) qb.andWhere("c.isPremium = :isPremium", { isPremium })
+
+    const [courses, total] = await qb.getManyAndCount()
+
+    // Attach enrollment status
+    let enrolledSet = new Set<string>()
+    if (userId && courses.length > 0) {
+      const enrollments = await this.courseProgressRepo.find({
+        where: courses.map((c) => ({ userId, courseId: c.id })),
+        select: ["courseId"],
+      })
+      enrolledSet = new Set(enrollments.map((e) => e.courseId))
+    }
+
+    const result = courses.map((c) => Object.assign(c, { enrolled: enrolledSet.has(c.id) }))
+    return { courses: result, total, page, limit }
+  }
+
+  // ─── GET /courses/my ──────────────────────────────────────────────────────────
+
+  async getMyCourses(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<{ enrollments: UserCourseProgress[]; total: number; page: number; limit: number }> {
+    const [enrollments, total] = await this.courseProgressRepo.findAndCount({
+      where: { userId },
+      relations: ["course"],
+      order: { enrolledAt: "DESC" },
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+    return { enrollments, total, page, limit }
+  }
+
+  // ─── GET /courses/:id ─────────────────────────────────────────────────────────
+
+  async getCourse(
+    courseId: string,
+    userId?: string,
+  ): Promise<
+    Course & { lessons: Lesson[]; enrolled: boolean; progress: UserCourseProgress | null }
+  > {
+    const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    const lessons = await this.lessonRepo.find({
+      where: { courseId },
+      order: { order: "ASC" },
+    })
+
+    let enrolled = false
+    let progress: UserCourseProgress | null = null
+
+    if (userId) {
+      progress = (await this.courseProgressRepo.findOne({ where: { userId, courseId } })) ?? null
+      enrolled = progress !== null
+    }
+
+    return Object.assign(course, { lessons, enrolled, progress })
+  }
+
+  // ─── POST /courses/:id/enroll ─────────────────────────────────────────────────
+
+  async enroll(courseId: string, userId: string): Promise<UserCourseProgress> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    const existing = await this.courseProgressRepo.findOne({ where: { userId, courseId } })
+    if (existing) throw new ConflictError("Already enrolled in this course")
+
+    const progress = this.courseProgressRepo.create({
+      userId,
+      courseId,
+      completedLessons: 0,
+      progressPercent: 0,
+    })
+    return this.courseProgressRepo.save(progress)
+  }
+
+  // ─── GET /courses/:id/lessons/:lessonId ───────────────────────────────────────
+
+  async getLesson(
+    courseId: string,
+    lessonId: string,
+    userId: string,
+  ): Promise<Lesson & { completed: boolean }> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    if (course.isPremium) {
+      const enrollment = await this.courseProgressRepo.findOne({ where: { userId, courseId } })
+      if (!enrollment) throw new ForbiddenError("Enroll in this course to access lessons")
+    }
+
+    const done = await this.lessonProgressRepo.findOne({ where: { userId, lessonId } })
+    return Object.assign(lesson, { completed: done !== null })
+  }
+
+  // ─── POST /courses/:id/lessons/:lessonId/complete ─────────────────────────────
+  // Used for video / pdf / text lessons. Quiz completion happens via quiz submission.
+
+  async completeLesson(
+    courseId: string,
+    lessonId: string,
+    userId: string,
+  ): Promise<UserCourseProgress> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    if (lesson.type === LessonType.QUIZ) {
+      throw new ForbiddenError("Quiz lessons are completed by submitting the quiz")
+    }
+
+    const enrollment = await this.courseProgressRepo.findOne({ where: { userId, courseId } })
+    if (!enrollment) throw new ForbiddenError("Enroll in this course first")
+
+    return this.markLessonDone(lessonId, userId, enrollment, course)
+  }
+
+  // ─── Shared: mark lesson done + update course progress ────────────────────────
+
+  async markLessonDone(
+    lessonId: string,
+    userId: string,
+    enrollment: UserCourseProgress,
+    course: Course,
+  ): Promise<UserCourseProgress> {
+    const existing = await this.lessonProgressRepo.findOne({ where: { userId, lessonId } })
+    if (existing) return enrollment // already completed — idempotent
+
+    await this.lessonProgressRepo.save(this.lessonProgressRepo.create({ userId, lessonId }))
+
+    enrollment.completedLessons += 1
+    if (course.totalLessons > 0) {
+      enrollment.progressPercent = Math.round(
+        (enrollment.completedLessons / course.totalLessons) * 100,
+      )
+    }
+    if (enrollment.completedLessons >= course.totalLessons && course.totalLessons > 0) {
+      enrollment.completedAt = new Date()
+    }
+
+    return this.courseProgressRepo.save(enrollment)
+  }
+
+  // ─── ADMIN: Create course ─────────────────────────────────────────────────────
+
+  async createCourse(dto: CreateCourseDto): Promise<Course> {
+    const course = this.courseRepo.create({
+      title: dto.title,
+      description: dto.description ?? null,
+      level: dto.level ?? null,
+      isPremium: dto.isPremium ?? false,
+      isPublished: false,
+      totalLessons: 0,
+    })
+    return this.courseRepo.save(course)
+  }
+
+  // ─── ADMIN: Update course ─────────────────────────────────────────────────────
+
+  async updateCourse(courseId: string, dto: UpdateCourseDto): Promise<Course> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    if (dto.title !== undefined) course.title = dto.title
+    if (dto.description !== undefined) course.description = dto.description
+    if (dto.thumbnailUrl !== undefined) course.thumbnailUrl = dto.thumbnailUrl
+    if (dto.level !== undefined) course.level = dto.level
+    if (dto.isPremium !== undefined) course.isPremium = dto.isPremium
+    if (dto.isPublished !== undefined) course.isPublished = dto.isPublished
+
+    return this.courseRepo.save(course)
+  }
+
+  // ─── ADMIN: Upload course thumbnail ──────────────────────────────────────────
+
+  async uploadThumbnail(courseId: string, file: Express.Multer.File): Promise<Course> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    if (course.thumbnailUrl) {
+      await this.storageService
+        .delete(this.storageService.extractKey(course.thumbnailUrl))
+        .catch(() => null)
+    }
+
+    const key = `courses/${courseId}/thumbnail-${Date.now()}`
+    const url = await this.storageService.upload(key, file.buffer, file.mimetype)
+    course.thumbnailUrl = url
+    return this.courseRepo.save(course)
+  }
+
+  // ─── ADMIN: Create lesson ─────────────────────────────────────────────────────
+
+  async createLesson(courseId: string, dto: CreateLessonDto): Promise<Lesson> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    const lesson = this.lessonRepo.create({
+      courseId,
+      title: dto.title,
+      type: dto.type,
+      content: dto.content ?? null,
+      videoUrl: dto.videoUrl ?? null,
+      order: dto.order ?? 0,
+      durationMinutes: dto.durationMinutes ?? null,
+    })
+    const saved = await this.lessonRepo.save(lesson)
+
+    course.totalLessons += 1
+    await this.courseRepo.save(course)
+
+    return saved
+  }
+
+  // ─── ADMIN: Update lesson ─────────────────────────────────────────────────────
+
+  async updateLesson(courseId: string, lessonId: string, dto: UpdateLessonDto): Promise<Lesson> {
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    if (dto.title !== undefined) lesson.title = dto.title
+    if (dto.type !== undefined) lesson.type = dto.type
+    if (dto.content !== undefined) lesson.content = dto.content
+    if (dto.videoUrl !== undefined) lesson.videoUrl = dto.videoUrl
+    if (dto.order !== undefined) lesson.order = dto.order
+    if (dto.durationMinutes !== undefined) lesson.durationMinutes = dto.durationMinutes
+
+    return this.lessonRepo.save(lesson)
+  }
+
+  // ─── ADMIN: Upload lesson PDF ─────────────────────────────────────────────────
+
+  async uploadLessonPdf(
+    courseId: string,
+    lessonId: string,
+    file: Express.Multer.File,
+  ): Promise<Lesson> {
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    if (lesson.pdfUrl) {
+      await this.storageService
+        .delete(this.storageService.extractKey(lesson.pdfUrl))
+        .catch(() => null)
+    }
+
+    const key = `courses/${courseId}/lessons/${lessonId}/pdf-${Date.now()}.pdf`
+    const url = await this.storageService.upload(key, file.buffer, file.mimetype)
+    lesson.pdfUrl = url
+    lesson.type = LessonType.PDF
+    return this.lessonRepo.save(lesson)
+  }
+
+  // ─── ADMIN: Delete lesson ─────────────────────────────────────────────────────
+
+  async deleteLesson(courseId: string, lessonId: string): Promise<void> {
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    if (lesson.pdfUrl) {
+      await this.storageService
+        .delete(this.storageService.extractKey(lesson.pdfUrl))
+        .catch(() => null)
+    }
+
+    await this.lessonRepo.remove(lesson)
+
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    if (course && course.totalLessons > 0) {
+      course.totalLessons -= 1
+      await this.courseRepo.save(course)
+    }
+  }
+}

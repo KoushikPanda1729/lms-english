@@ -22,6 +22,17 @@ import { NotificationService } from "./modules/notifications/notification.servic
 import { NotificationController } from "./modules/notifications/notification.controller"
 import { createNotificationProvider } from "./modules/notifications/providers/notification-provider.factory"
 import { StorageService } from "./services/storage.service"
+import { Course } from "./entities/Course.entity"
+import { Lesson } from "./entities/Lesson.entity"
+import { Quiz } from "./entities/Quiz.entity"
+import { QuizQuestion } from "./entities/QuizQuestion.entity"
+import { QuizOption } from "./entities/QuizOption.entity"
+import { UserCourseProgress } from "./entities/UserCourseProgress.entity"
+import { UserLessonProgress } from "./entities/UserLessonProgress.entity"
+import { UserQuizAttempt } from "./entities/UserQuizAttempt.entity"
+import { CourseService } from "./modules/courses/course.service"
+import { QuizService } from "./modules/courses/quiz.service"
+import { CourseController } from "./modules/courses/course.controller"
 
 export function buildContainer() {
   // ─── Repositories ───────────────────────────────────────────────────────────
@@ -34,6 +45,14 @@ export function buildContainer() {
   const reportRepo = AppDataSource.getRepository(Report)
   const deviceTokenRepo = AppDataSource.getRepository(DeviceToken)
   const notificationRepo = AppDataSource.getRepository(Notification)
+  const courseRepo = AppDataSource.getRepository(Course)
+  const lessonRepo = AppDataSource.getRepository(Lesson)
+  const quizRepo = AppDataSource.getRepository(Quiz)
+  const quizQuestionRepo = AppDataSource.getRepository(QuizQuestion)
+  const quizOptionRepo = AppDataSource.getRepository(QuizOption)
+  const courseProgressRepo = AppDataSource.getRepository(UserCourseProgress)
+  const lessonProgressRepo = AppDataSource.getRepository(UserLessonProgress)
+  const quizAttemptRepo = AppDataSource.getRepository(UserQuizAttempt)
 
   // ─── Shared services ────────────────────────────────────────────────────────
   const storageService = new StorageService()
@@ -78,6 +97,26 @@ export function buildContainer() {
   )
   const adminController = new AdminController(adminService)
 
+  // ─── Courses & LMS ──────────────────────────────────────────────────────────
+  const courseService = new CourseService(
+    courseRepo,
+    lessonRepo,
+    courseProgressRepo,
+    lessonProgressRepo,
+    storageService,
+  )
+  const quizService = new QuizService(
+    quizRepo,
+    quizQuestionRepo,
+    quizOptionRepo,
+    quizAttemptRepo,
+    courseProgressRepo,
+    courseRepo,
+    lessonRepo,
+    courseService,
+  )
+  const courseController = new CourseController(courseService, quizService)
+
   return {
     authController,
     userController,
@@ -87,6 +126,7 @@ export function buildContainer() {
     adminController,
     notificationController,
     notificationService,
+    courseController,
     userRepo,
     profileRepo,
   }

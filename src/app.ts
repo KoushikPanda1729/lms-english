@@ -9,6 +9,7 @@ import { userRouter } from "./modules/users/user.routes"
 import { sessionRouter } from "./modules/sessions/session.routes"
 import { reportRouter, adminRouter } from "./modules/reports/report.routes"
 import { adminUserRouter } from "./modules/admin/admin.routes"
+import { courseRouter, adminCourseRouter } from "./modules/courses/course.routes"
 import { notificationRouter } from "./modules/notifications/notification.routes"
 import { jwksRouter } from "./modules/well-known/jwks.routes"
 import { globalErrorHandler } from "./middleware/error.middleware"
@@ -60,6 +61,8 @@ export function buildApp(container: Container): Application {
   app.use("/admin", adminRouter(container.reportController))
   app.use("/admin", adminUserRouter(container.adminController))
   app.use("/notifications", notificationRouter(container.notificationController))
+  app.use("/courses", courseRouter(container.courseController))
+  app.use("/admin", adminCourseRouter(container.courseController))
   app.use("/.well-known", jwksRouter())
 
   // ─── Global error handler (must be last) ─────────────────────────────────────

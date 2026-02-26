@@ -31,6 +31,18 @@
       "value": "",
       "type": "default",
       "enabled": true
+    },
+    {
+      "key": "courseId",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "lessonId",
+      "value": "",
+      "type": "default",
+      "enabled": true
     }
   ],
   "_postman_variable_scope": "environment",
