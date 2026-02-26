@@ -38,6 +38,9 @@ import { PaymentService } from "./modules/payments/payment.service"
 import { PaymentController } from "./modules/payments/payment.controller"
 import { createPaymentProvider } from "./modules/payments/providers/payment-provider.factory"
 import { getRedisClient } from "./config/redis.config"
+import { Coupon } from "./entities/Coupon.entity"
+import { CouponService } from "./modules/coupons/coupon.service"
+import { CouponController } from "./modules/coupons/coupon.controller"
 
 export function buildContainer() {
   // ─── Repositories ───────────────────────────────────────────────────────────
@@ -59,6 +62,7 @@ export function buildContainer() {
   const lessonProgressRepo = AppDataSource.getRepository(UserLessonProgress)
   const quizAttemptRepo = AppDataSource.getRepository(UserQuizAttempt)
   const paymentRepo = AppDataSource.getRepository(Payment)
+  const couponRepo = AppDataSource.getRepository(Coupon)
 
   // ─── Shared services ────────────────────────────────────────────────────────
   const storageService = new StorageService()
@@ -124,6 +128,10 @@ export function buildContainer() {
   )
   const courseController = new CourseController(courseService, quizService)
 
+  // ─── Coupons ─────────────────────────────────────────────────────────────────
+  const couponService = new CouponService(couponRepo, courseRepo)
+  const couponController = new CouponController(couponService)
+
   // ─── Payments ───────────────────────────────────────────────────────────────
   const paymentProvider = createPaymentProvider()
   const paymentService = new PaymentService(
@@ -134,6 +142,7 @@ export function buildContainer() {
     AppDataSource,
     redis,
     notificationService,
+    couponService,
   )
   const paymentController = new PaymentController(paymentService)
 
@@ -148,6 +157,7 @@ export function buildContainer() {
     notificationService,
     courseController,
     paymentController,
+    couponController,
     userRepo,
     profileRepo,
   }

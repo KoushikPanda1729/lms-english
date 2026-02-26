@@ -25,7 +25,9 @@ export class PaymentController {
       const courseId = String(req.params.courseId)
       if (!uuidRegex.test(courseId)) throw new ValidationError("Invalid course ID")
 
-      const result = await this.paymentService.createPriceQuote(courseId, req.user!.id)
+      const couponCode = req.query.coupon as string | undefined
+
+      const result = await this.paymentService.createPriceQuote(courseId, req.user!.id, couponCode)
       res.json(success(result, "Price quote generated"))
     } catch (err) {
       next(err)

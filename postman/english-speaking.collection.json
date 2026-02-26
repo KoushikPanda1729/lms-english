@@ -16,8 +16,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           }
         },
@@ -28,8 +32,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/.well-known/jwks.json",
-              "host": ["{{baseUrl}}"],
-              "path": [".well-known", "jwks.json"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ".well-known",
+                "jwks.json"
+              ]
             }
           }
         }
@@ -43,12 +52,20 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/self",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "self"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "self"
+              ]
             }
           }
         },
@@ -72,7 +89,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -80,8 +100,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             }
           }
         },
@@ -105,7 +130,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -113,8 +141,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           }
         },
@@ -138,7 +171,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -146,8 +182,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             }
           }
         },
@@ -156,7 +197,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -164,8 +208,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
             }
           }
         },
@@ -189,7 +238,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -197,8 +249,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/google",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "google"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "google"
+              ]
             }
           }
         },
@@ -207,7 +264,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -215,8 +275,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/forgot-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "forgot-password"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
             }
           }
         },
@@ -225,7 +290,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -233,8 +301,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/reset-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "reset-password"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
             }
           }
         }
@@ -248,12 +321,20 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
             }
           }
         },
@@ -262,8 +343,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -271,8 +358,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/users/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me"
+              ]
             }
           }
         },
@@ -281,7 +373,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "formdata",
@@ -296,8 +391,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/users/me/avatar",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me", "avatar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "avatar"
+              ]
             }
           }
         },
@@ -306,12 +407,21 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/users/me/avatar",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "me", "avatar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "me",
+                "avatar"
+              ]
             }
           }
         },
@@ -322,8 +432,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/users/{{userId}}/public",
-              "host": ["{{baseUrl}}"],
-              "path": ["users", "{{userId}}", "public"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "public"
+              ]
             }
           }
         }
@@ -337,15 +453,28 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/sessions?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           }
@@ -355,12 +484,20 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}"
+              ]
             }
           }
         },
@@ -369,8 +506,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -378,8 +521,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}/rate",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}", "rate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "rate"
+              ]
             }
           }
         }
@@ -393,8 +542,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -402,8 +557,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/reports",
-              "host": ["{{baseUrl}}"],
-              "path": ["reports"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports"
+              ]
             },
             "description": "reason: harassment | spam | inappropriate | hate_speech | other\nsessionId is optional"
           }
@@ -413,15 +572,29 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/reports/mine?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["reports", "mine"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "reports",
+                "mine"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             }
           }
@@ -436,12 +609,20 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "stats"
+              ]
             },
             "description": "Admin only. Platform-wide stats: totalUsers, bannedUsers, totalSessions, sessionsToday, activeReports."
           }
@@ -451,18 +632,47 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/users?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" },
-                { "key": "search", "value": "", "disabled": true, "description": "Search by email, displayName or username" },
-                { "key": "isBanned", "value": "false", "disabled": true, "description": "true | false" },
-                { "key": "role", "value": "student", "disabled": true, "description": "student | admin" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true,
+                  "description": "Search by email, displayName or username"
+                },
+                {
+                  "key": "isBanned",
+                  "value": "false",
+                  "disabled": true,
+                  "description": "true | false"
+                },
+                {
+                  "key": "role",
+                  "value": "student",
+                  "disabled": true,
+                  "description": "student | admin"
+                }
               ]
             },
             "description": "Admin only. Paginated user list with profile and pending report count."
@@ -473,12 +683,21 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/users/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{userId}}"
+              ]
             },
             "description": "Admin only. Full user detail including profile, pending report count, total report count."
           }
@@ -488,8 +707,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -497,10 +722,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/users/{{userId}}/ban",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users", "{{userId}}", "ban"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{userId}}",
+                "ban"
+              ]
             },
-            "description": "Admin only.\nbanned: true → bans user + revokes all refresh tokens\nbanned: false → unbans user\nCannot ban another admin account."
+            "description": "Admin only.\nbanned: true \u2192 bans user + revokes all refresh tokens\nbanned: false \u2192 unbans user\nCannot ban another admin account."
           }
         },
         {
@@ -508,8 +740,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -517,8 +755,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/users/{{userId}}/role",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "users", "{{userId}}", "role"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "users",
+                "{{userId}}",
+                "role"
+              ]
             },
             "description": "Admin only. role: student | admin"
           }
@@ -528,16 +773,34 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/reports?page=1&limit=20&status=pending",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "reports"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "reports"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" },
-                { "key": "status", "value": "pending", "description": "pending | reviewed | actioned | dismissed" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "pending | reviewed | actioned | dismissed"
+                }
               ]
             },
             "description": "Admin only. Filter by status (optional)."
@@ -548,8 +811,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -557,10 +826,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/reports/{{reportId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "reports", "{{reportId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "reports",
+                "{{reportId}}"
+              ]
             },
-            "description": "Admin only.\nstatus: pending | reviewed | actioned | dismissed\nbanReportedUser: true → sets user.is_banned=true and revokes all refresh tokens"
+            "description": "Admin only.\nstatus: pending | reviewed | actioned | dismissed\nbanReportedUser: true \u2192 sets user.is_banned=true and revokes all refresh tokens"
           }
         }
       ]
@@ -573,8 +848,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -582,10 +863,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/notifications/device",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications", "device"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "device"
+              ]
             },
-            "description": "Call on every app launch — upserts the FCM token for this device.\nplatform: ios | android"
+            "description": "Call on every app launch \u2014 upserts the FCM token for this device.\nplatform: ios | android"
           }
         },
         {
@@ -593,8 +879,14 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -602,10 +894,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/notifications/device",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications", "device"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "device"
+              ]
             },
-            "description": "Call on logout — removes the FCM token for this device only so push stops."
+            "description": "Call on logout \u2014 removes the FCM token for this device only so push stops."
           }
         },
         {
@@ -613,15 +910,29 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/notifications?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20", "description": "max 50" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "max 50"
+                }
               ]
             },
             "description": "Returns paginated notifications for the current user, newest first.\nResponse: { notifications[], total, page, limit }"
@@ -632,12 +943,20 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/notifications/read-all",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications", "read-all"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "read-all"
+              ]
             }
           }
         },
@@ -646,12 +965,21 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
-              "host": ["{{baseUrl}}"],
-              "path": ["notifications", "{{notificationId}}", "read"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "notifications",
+                "{{notificationId}}",
+                "read"
+              ]
             }
           }
         }
@@ -659,7 +987,7 @@
     },
     {
       "name": "Matchmaking (Socket.io)",
-      "description": "Socket.io events — connect to {{socketUrl}} with auth token.\n\nConnect:\n  const socket = io('http://localhost:5503', { auth: { token: 'Bearer <accessToken>' } })\n\nCLIENT → SERVER events:\n  find_partner   { level?: 'beginner'|'intermediate'|'advanced', topic?: string }\n  cancel_search  (no payload)\n\nSERVER → CLIENT events:\n  searching      { estimated_wait_seconds: number }\n  match_found    { roomId, partner: { userId, displayName, avatarUrl, level }, iceServers }\n  peer_left      { reason: 'disconnect' }\n  error          { code, message }",
+      "description": "Socket.io events \u2014 connect to {{socketUrl}} with auth token.\n\nConnect:\n  const socket = io('http://localhost:5503', { auth: { token: 'Bearer <accessToken>' } })\n\nCLIENT \u2192 SERVER events:\n  find_partner   { level?: 'beginner'|'intermediate'|'advanced', topic?: string }\n  cancel_search  (no payload)\n\nSERVER \u2192 CLIENT events:\n  searching      { estimated_wait_seconds: number }\n  match_found    { roomId, partner: { userId, displayName, avatarUrl, level }, iceServers }\n  peer_left      { reason: 'disconnect' }\n  error          { code, message }",
       "item": [
         {
           "name": "Socket.io Connection Info",
@@ -668,11 +996,22 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/socket.io/?EIO=4&transport=polling",
-              "host": ["{{baseUrl}}"],
-              "path": ["socket.io", ""],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socket.io",
+                ""
+              ],
               "query": [
-                { "key": "EIO", "value": "4" },
-                { "key": "transport", "value": "polling" }
+                {
+                  "key": "EIO",
+                  "value": "4"
+                },
+                {
+                  "key": "transport",
+                  "value": "polling"
+                }
               ]
             },
             "description": "Use this to verify the Socket.io server is running.\n\nTo actually test matchmaking, use a Socket.io client in code:\n\nconst { io } = require('socket.io-client')\nconst socket = io('http://localhost:5503', {\n  auth: { token: 'Bearer <accessToken>' }\n})\nsocket.on('connect', () => console.log('connected'))\nsocket.emit('find_partner', { level: 'beginner' })\nsocket.on('match_found', (data) => console.log(data))"
@@ -690,13 +1029,33 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/courses?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" },
-                { "key": "level", "value": "beginner", "disabled": true, "description": "beginner | intermediate | advanced" },
-                { "key": "isPremium", "value": "false", "disabled": true, "description": "true | false" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "level",
+                  "value": "beginner",
+                  "disabled": true,
+                  "description": "beginner | intermediate | advanced"
+                },
+                {
+                  "key": "isPremium",
+                  "value": "false",
+                  "disabled": true,
+                  "description": "true | false"
+                }
               ]
             },
             "description": "Public. Returns paginated published courses. If authenticated, each course includes an 'enrolled' flag."
@@ -723,8 +1082,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/courses/{{courseId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "{{courseId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}"
+              ]
             },
             "description": "Public. Returns course details with lessons array. If authenticated, includes enrollment status and progress."
           }
@@ -734,15 +1098,29 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/courses/my?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "my"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "my"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             },
             "description": "Auth required. Returns enrolled courses with progress for the current user."
@@ -753,12 +1131,21 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/courses/{{courseId}}/enroll",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "{{courseId}}", "enroll"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "enroll"
+              ]
             },
             "description": "Auth required. Enrolls the current user in the course. Creates a UserCourseProgress record."
           }
@@ -782,12 +1169,22 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/courses/{{courseId}}/lessons/{{lessonId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "{{courseId}}", "lessons", "{{lessonId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}"
+              ]
             },
             "description": "Auth required. Premium courses require enrollment. Returns lesson with 'completed' flag."
           }
@@ -797,14 +1194,25 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/courses/{{courseId}}/lessons/{{lessonId}}/complete",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "{{courseId}}", "lessons", "{{lessonId}}", "complete"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}",
+                "complete"
+              ]
             },
-            "description": "Auth required. Marks a video/pdf/text lesson as complete and updates course progress. Not valid for quiz lessons — those are completed via /quiz/submit."
+            "description": "Auth required. Marks a video/pdf/text lesson as complete and updates course progress. Not valid for quiz lessons \u2014 those are completed via /quiz/submit."
           }
         },
         {
@@ -812,12 +1220,23 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/courses/{{courseId}}/lessons/{{lessonId}}/quiz",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "{{courseId}}", "lessons", "{{lessonId}}", "quiz"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}",
+                "quiz"
+              ]
             },
             "description": "Auth required. Returns quiz with questions and options (isCorrect hidden). Includes bestAttempt if the user has previously submitted."
           }
@@ -827,8 +1246,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -836,8 +1261,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/courses/{{courseId}}/lessons/{{lessonId}}/quiz/submit",
-              "host": ["{{baseUrl}}"],
-              "path": ["courses", "{{courseId}}", "lessons", "{{lessonId}}", "quiz", "submit"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}",
+                "quiz",
+                "submit"
+              ]
             },
             "description": "Auth required. Must answer every question. Returns { score, passed, answers }.\nIf passed (score >= passingScore), marks the lesson as complete and updates course progress."
           }
@@ -861,8 +1295,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -870,8 +1310,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses"
+              ]
             },
             "description": "Admin only. Creates a course (isPublished=false by default).\nlevel: beginner | intermediate | advanced"
           }
@@ -881,8 +1326,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -890,10 +1341,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}"
+              ]
             },
-            "description": "Admin only. Partial update — pass only fields you want to change.\nSet isPublished: true to make the course visible to users."
+            "description": "Admin only. Partial update \u2014 pass only fields you want to change.\nSet isPublished: true to make the course visible to users."
           }
         },
         {
@@ -901,7 +1358,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "formdata",
@@ -910,14 +1370,21 @@
                   "key": "thumbnail",
                   "type": "file",
                   "src": "",
-                  "description": "jpeg/png/webp image — max 20MB"
+                  "description": "jpeg/png/webp image \u2014 max 20MB"
                 }
               ]
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/thumbnail",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "thumbnail"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "thumbnail"
+              ]
             },
             "description": "Admin only. Uploads a thumbnail image. Replaces any existing thumbnail."
           }
@@ -941,8 +1408,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -950,8 +1423,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/lessons",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "lessons"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "lessons"
+              ]
             },
             "description": "Admin only. Creates a lesson and increments course.totalLessons.\ntype: video | pdf | text | quiz\nFor quiz lessons, create the quiz separately via POST /admin/courses/:id/lessons/:lessonId/quiz"
           }
@@ -961,8 +1441,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -970,8 +1456,16 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/lessons/{{lessonId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "lessons", "{{lessonId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}"
+              ]
             },
             "description": "Admin only. Partial update for lesson metadata."
           }
@@ -981,7 +1475,10 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "body": {
               "mode": "formdata",
@@ -990,14 +1487,23 @@
                   "key": "pdf",
                   "type": "file",
                   "src": "",
-                  "description": "PDF file — max 20MB"
+                  "description": "PDF file \u2014 max 20MB"
                 }
               ]
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/lessons/{{lessonId}}/pdf",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "lessons", "{{lessonId}}", "pdf"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}",
+                "pdf"
+              ]
             },
             "description": "Admin only. Uploads a PDF for the lesson. Also sets lesson.type = 'pdf'."
           }
@@ -1007,12 +1513,23 @@
           "request": {
             "method": "DELETE",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/lessons/{{lessonId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "lessons", "{{lessonId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}"
+              ]
             },
             "description": "Admin only. Deletes the lesson, removes any PDF from storage, and decrements course.totalLessons."
           }
@@ -1022,8 +1539,14 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1031,8 +1554,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/lessons/{{lessonId}}/quiz",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "lessons", "{{lessonId}}", "quiz"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}",
+                "quiz"
+              ]
             },
             "description": "Admin only. Creates a quiz for a lesson. Also sets lesson.type = 'quiz'.\ntype: single (one correct answer) | multiple (multiple correct answers)\npassingScore: 1-100, defaults to 70"
           }
@@ -1042,8 +1574,14 @@
           "request": {
             "method": "PATCH",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1051,8 +1589,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}/lessons/{{lessonId}}/quiz",
-              "host": ["{{baseUrl}}"],
-              "path": ["admin", "courses", "{{courseId}}", "lessons", "{{lessonId}}", "quiz"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "courses",
+                "{{courseId}}",
+                "lessons",
+                "{{lessonId}}",
+                "quiz"
+              ]
             },
             "description": "Admin only. Update quiz title and/or passingScore only."
           }
@@ -1072,6 +1619,9 @@
                   "const res = pm.response.json();",
                   "if (res.data && res.data.priceToken) {",
                   "  pm.environment.set('priceToken', res.data.priceToken);",
+                  "}",
+                  "if (res.data && res.data.discountPercent !== undefined) {",
+                  "  pm.environment.set('discountPercent', res.data.discountPercent);",
                   "}"
                 ],
                 "type": "text/javascript"
@@ -1081,14 +1631,32 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
-              "raw": "{{baseUrl}}/payments/courses/{{courseId}}/quote",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "courses", "{{courseId}}", "quote"]
+              "raw": "{{baseUrl}}/payments/courses/{{courseId}}/quote?coupon=SAVE20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "courses",
+                "{{courseId}}",
+                "quote"
+              ],
+              "query": [
+                {
+                  "key": "coupon",
+                  "value": "SAVE20",
+                  "description": "Optional coupon/discount code (case-insensitive)",
+                  "disabled": true
+                }
+              ]
             },
-            "description": "Auth required. Step 1 of checkout.\nGenerates a one-time price quote token (10min TTL) tied to the authenticated user.\nReturns: { priceToken, price, currency, expiresIn }\nClient must pass priceToken to the checkout endpoint — never send raw price."
+            "description": "Auth required. Step 1 of checkout.\nGenerates a one-time price quote token (10min TTL) tied to the authenticated user.\nOptional: pass ?coupon=CODE to apply a discount code.\nReturns: { priceToken, price, originalPrice, discountPercent, discountAmount, currency, expiresIn }\nClient must pass priceToken to the checkout endpoint \u2014 never send raw price."
           }
         },
         {
@@ -1111,9 +1679,19 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
-              { "key": "Content-Type", "value": "application/json" },
-              { "key": "Idempotency-Key", "value": "{{$guid}}", "description": "Client-generated UUID. Reuse on retry, generate new for new attempt." }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Client-generated UUID. Reuse on retry, generate new for new attempt."
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1121,10 +1699,17 @@
             },
             "url": {
               "raw": "{{baseUrl}}/payments/courses/{{courseId}}/checkout",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "courses", "{{courseId}}", "checkout"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "courses",
+                "{{courseId}}",
+                "checkout"
+              ]
             },
-            "description": "Auth required. Step 2 of checkout.\nRequires priceToken from the /quote endpoint (one-time use, 10min TTL).\nRequires Idempotency-Key header (UUID) — same key on retry returns cached result.\nReturns: { checkoutUrl, sessionId }\nRedirect user to checkoutUrl to complete payment on Stripe."
+            "description": "Auth required. Step 2 of checkout.\nRequires priceToken from the /quote endpoint (one-time use, 10min TTL).\nRequires Idempotency-Key header (UUID) \u2014 same key on retry returns cached result.\nReturns: { checkoutUrl, sessionId }\nRedirect user to checkoutUrl to complete payment on Stripe."
           }
         },
         {
@@ -1132,8 +1717,15 @@
           "request": {
             "method": "POST",
             "header": [
-              { "key": "stripe-signature", "value": "t=...,v1=...", "description": "Set by Stripe automatically" },
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "stripe-signature",
+                "value": "t=...,v1=...",
+                "description": "Set by Stripe automatically"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -1141,10 +1733,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/payments/webhook",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "webhook"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "webhook"
+              ]
             },
-            "description": "Called by Stripe — NOT by client.\nVerifies stripe-signature HMAC.\nOn checkout.session.completed:\n  1. Validates amountPaid matches DB record\n  2. DB transaction: marks payment paid + enrolls user\n  3. Sends push notification to user\nConfigure this URL in your Stripe Dashboard → Webhooks."
+            "description": "Called by Stripe \u2014 NOT by client.\nVerifies stripe-signature HMAC.\nOn checkout.session.completed:\n  1. Validates amountPaid matches DB record\n  2. DB transaction: marks payment paid + enrolls user\n  3. Sends push notification to user\nConfigure this URL in your Stripe Dashboard \u2192 Webhooks."
           }
         },
         {
@@ -1152,15 +1749,29 @@
           "request": {
             "method": "GET",
             "header": [
-              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
             ],
             "url": {
               "raw": "{{baseUrl}}/payments/history?page=1&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["payments", "history"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "history"
+              ],
               "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "20" }
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
               ]
             },
             "description": "Auth required. Returns paginated payment history for the current user."
@@ -1170,7 +1781,7 @@
     },
     {
       "name": "WebRTC Signaling (Socket.io)",
-      "description": "WebRTC signaling events — uses the same Socket.io connection as Matchmaking.\n\nFLOW:\n  1. Both users receive match_found → get roomId\n  2. Both emit join_room { roomId }\n  3. Server emits peer_joined to both:\n       caller   → create RTCPeerConnection, create offer, emit webrtc_offer\n       receiver → create RTCPeerConnection, wait for offer\n  4. Caller emits webrtc_offer { roomId, sdp }\n  5. Receiver emits webrtc_answer { roomId, sdp }\n  6. Both sides emit webrtc_ice { roomId, candidate } as candidates arrive\n  7. Either side emits end_call { roomId } to terminate\n\nCLIENT → SERVER events:\n  join_room     { roomId }\n  webrtc_offer  { roomId, sdp: RTCSessionDescriptionInit }\n  webrtc_answer { roomId, sdp: RTCSessionDescriptionInit }\n  webrtc_ice    { roomId, candidate: RTCIceCandidateInit }\n  end_call      { roomId }\n\nSERVER → CLIENT events:\n  peer_joined   { role: 'caller'|'receiver', roomId }\n  webrtc_offer  { roomId, sdp }\n  webrtc_answer { roomId, sdp }\n  webrtc_ice    { roomId, candidate }\n  peer_left     { reason: 'ended'|'disconnect' }\n  error         { code, message }",
+      "description": "WebRTC signaling events \u2014 uses the same Socket.io connection as Matchmaking.\n\nFLOW:\n  1. Both users receive match_found \u2192 get roomId\n  2. Both emit join_room { roomId }\n  3. Server emits peer_joined to both:\n       caller   \u2192 create RTCPeerConnection, create offer, emit webrtc_offer\n       receiver \u2192 create RTCPeerConnection, wait for offer\n  4. Caller emits webrtc_offer { roomId, sdp }\n  5. Receiver emits webrtc_answer { roomId, sdp }\n  6. Both sides emit webrtc_ice { roomId, candidate } as candidates arrive\n  7. Either side emits end_call { roomId } to terminate\n\nCLIENT \u2192 SERVER events:\n  join_room     { roomId }\n  webrtc_offer  { roomId, sdp: RTCSessionDescriptionInit }\n  webrtc_answer { roomId, sdp: RTCSessionDescriptionInit }\n  webrtc_ice    { roomId, candidate: RTCIceCandidateInit }\n  end_call      { roomId }\n\nSERVER \u2192 CLIENT events:\n  peer_joined   { role: 'caller'|'receiver', roomId }\n  webrtc_offer  { roomId, sdp }\n  webrtc_answer { roomId, sdp }\n  webrtc_ice    { roomId, candidate }\n  peer_left     { reason: 'ended'|'disconnect' }\n  error         { code, message }",
       "item": [
         {
           "name": "Signaling Flow Reference",
@@ -1179,14 +1790,198 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/socket.io/?EIO=4&transport=polling",
-              "host": ["{{baseUrl}}"],
-              "path": ["socket.io", ""],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "socket.io",
+                ""
+              ],
               "query": [
-                { "key": "EIO", "value": "4" },
-                { "key": "transport", "value": "polling" }
+                {
+                  "key": "EIO",
+                  "value": "4"
+                },
+                {
+                  "key": "transport",
+                  "value": "polling"
+                }
               ]
             },
-            "description": "WebRTC signaling runs over the same Socket.io connection.\nNo separate HTTP endpoint — all signaling is via Socket.io events.\n\nExample (caller side after receiving peer_joined with role='caller'):\n\nconst pc = new RTCPeerConnection({ iceServers })\n\npc.onicecandidate = ({ candidate }) => {\n  if (candidate) socket.emit('webrtc_ice', { roomId, candidate })\n}\n\nsocket.on('webrtc_ice', ({ candidate }) => pc.addIceCandidate(candidate))\nsocket.on('webrtc_answer', ({ sdp }) => pc.setRemoteDescription(sdp))\n\nconst offer = await pc.createOffer()\nawait pc.setLocalDescription(offer)\nsocket.emit('webrtc_offer', { roomId, sdp: pc.localDescription })\n\n────────────────────────────────────────────────────────\n\nExample (receiver side after receiving peer_joined with role='receiver'):\n\nconst pc = new RTCPeerConnection({ iceServers })\n\npc.onicecandidate = ({ candidate }) => {\n  if (candidate) socket.emit('webrtc_ice', { roomId, candidate })\n}\n\nsocket.on('webrtc_ice', ({ candidate }) => pc.addIceCandidate(candidate))\nsocket.on('webrtc_offer', async ({ sdp }) => {\n  await pc.setRemoteDescription(sdp)\n  const answer = await pc.createAnswer()\n  await pc.setLocalDescription(answer)\n  socket.emit('webrtc_answer', { roomId, sdp: pc.localDescription })\n})"
+            "description": "WebRTC signaling runs over the same Socket.io connection.\nNo separate HTTP endpoint \u2014 all signaling is via Socket.io events.\n\nExample (caller side after receiving peer_joined with role='caller'):\n\nconst pc = new RTCPeerConnection({ iceServers })\n\npc.onicecandidate = ({ candidate }) => {\n  if (candidate) socket.emit('webrtc_ice', { roomId, candidate })\n}\n\nsocket.on('webrtc_ice', ({ candidate }) => pc.addIceCandidate(candidate))\nsocket.on('webrtc_answer', ({ sdp }) => pc.setRemoteDescription(sdp))\n\nconst offer = await pc.createOffer()\nawait pc.setLocalDescription(offer)\nsocket.emit('webrtc_offer', { roomId, sdp: pc.localDescription })\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n\nExample (receiver side after receiving peer_joined with role='receiver'):\n\nconst pc = new RTCPeerConnection({ iceServers })\n\npc.onicecandidate = ({ candidate }) => {\n  if (candidate) socket.emit('webrtc_ice', { roomId, candidate })\n}\n\nsocket.on('webrtc_ice', ({ candidate }) => pc.addIceCandidate(candidate))\nsocket.on('webrtc_offer', async ({ sdp }) => {\n  await pc.setRemoteDescription(sdp)\n  const answer = await pc.createAnswer()\n  await pc.setLocalDescription(answer)\n  socket.emit('webrtc_answer', { roomId, sdp: pc.localDescription })\n})"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Coupons (Admin)",
+      "item": [
+        {
+          "name": "Create Coupon",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"SAVE20\",\n  \"discountPercent\": 20,\n  \"courseId\": null,\n  \"maxUses\": 100,\n  \"expiresAt\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/coupons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "coupons"
+              ]
+            },
+            "description": "Admin only. Creates a percentage-based discount coupon.\ncourseId: null = global (all courses); UUID = restrict to one course.\nmaxUses: null = unlimited.\nexpiresAt: ISO 8601 datetime or null."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "  pm.environment.set('couponId', res.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Coupons",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/coupons?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "coupons"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "disabled": true
+                },
+                {
+                  "key": "courseId",
+                  "value": "{{courseId}}",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Admin only. Paginated list of coupons. Filter by isActive or courseId."
+          }
+        },
+        {
+          "name": "Get Coupon",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/coupons/{{couponId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "coupons",
+                "{{couponId}}"
+              ]
+            },
+            "description": "Admin only. Get a single coupon by ID."
+          }
+        },
+        {
+          "name": "Update Coupon",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/coupons/{{couponId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "coupons",
+                "{{couponId}}"
+              ]
+            },
+            "description": "Admin only. Update isActive, maxUses, or expiresAt. Code and discountPercent are immutable."
+          }
+        },
+        {
+          "name": "Delete Coupon",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/coupons/{{couponId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "admin",
+                "coupons",
+                "{{couponId}}"
+              ]
+            },
+            "description": "Admin only. Hard-delete a coupon."
           }
         }
       ]

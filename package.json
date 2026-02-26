@@ -18,6 +18,7 @@
     "migration:show": "cross-env NODE_ENV=development typeorm-ts-node-esm migration:show -d src/config/database.config.ts",
     "migration:create": "cross-env NODE_ENV=development typeorm-ts-node-esm migration:create",
     "keys:generate": "node scripts/generate-keys.js",
+    "seed:admin": "cross-env NODE_ENV=development node --loader ts-node/esm --no-warnings src/scripts/seed-admin.ts",
     "prepare": "husky"
   },
   "dependencies": {

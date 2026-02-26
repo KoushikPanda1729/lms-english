@@ -9,6 +9,7 @@ import { NotFoundError, ConflictError, ValidationError } from "../../shared/erro
 import { Config } from "../../config/config"
 import type { IPaymentProvider } from "./providers/payment-provider.interface"
 import type { NotificationService } from "../notifications/notification.service"
+import type { CouponService } from "../coupons/coupon.service"
 import { NotificationType } from "../../enums/index"
 import logger from "../../config/logger"
 
@@ -17,9 +18,11 @@ const PRICE_QUOTE_TTL = 600 // 10 minutes
 
 interface PriceQuotePayload {
   courseId: string
-  price: number
+  price: number // final charged price (after discount)
   currency: string
   token: string // opaque UUID returned to client
+  couponId: string | null
+  discountAmount: number
 }
 
 export class PaymentService {
@@ -31,6 +34,7 @@ export class PaymentService {
     private readonly dataSource: DataSource,
     private readonly redis: Redis,
     private readonly notificationService: NotificationService,
+    private readonly couponService?: CouponService,
   ) {}
 
   // ─── GET /payments/courses/:courseId/quote ────────────────────────────────────
@@ -41,7 +45,16 @@ export class PaymentService {
   async createPriceQuote(
     courseId: string,
     userId: string,
-  ): Promise<{ priceToken: string; price: number; currency: string; expiresIn: number }> {
+    couponCode?: string,
+  ): Promise<{
+    priceToken: string
+    price: number
+    originalPrice: number
+    discountPercent: number | null
+    discountAmount: number
+    currency: string
+    expiresIn: number
+  }> {
     const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
     if (!course) throw new NotFoundError("Course not found")
 
@@ -56,6 +69,20 @@ export class PaymentService {
     const alreadyEnrolled = await this.courseProgressRepo.findOne({ where: { userId, courseId } })
     if (alreadyEnrolled) throw new ConflictError("Already enrolled in this course")
 
+    // Resolve coupon discount
+    let couponId: string | null = null
+    let discountAmount = 0
+    let discountPercent: number | null = null
+
+    if (couponCode && this.couponService) {
+      const coupon = await this.couponService.validate(couponCode, courseId)
+      discountAmount = Math.floor((course.price * coupon.discountPercent) / 100)
+      discountPercent = coupon.discountPercent
+      couponId = coupon.id
+    }
+
+    const finalPrice = course.price - discountAmount
+
     // Deterministic key — one slot per user per course.
     // SET overwrites any previous quote, so flooding /quote just replaces the old token.
     const quoteKey = `price_quote:${userId}:${courseId}`
@@ -63,16 +90,21 @@ export class PaymentService {
 
     const payload: PriceQuotePayload = {
       courseId,
-      price: course.price,
+      price: finalPrice,
       currency: Config.PAYMENT_CURRENCY,
       token,
+      couponId,
+      discountAmount,
     }
 
     await this.redis.set(quoteKey, JSON.stringify(payload), "EX", PRICE_QUOTE_TTL)
 
     return {
       priceToken: token,
-      price: course.price,
+      price: finalPrice,
+      originalPrice: course.price,
+      discountPercent,
+      discountAmount,
       currency: Config.PAYMENT_CURRENCY,
       expiresIn: PRICE_QUOTE_TTL,
     }
@@ -117,11 +149,13 @@ export class PaymentService {
     }
 
     // 5. Cross-validate token price against current DB price.
-    //    Catches price changes between quote generation and checkout.
+    //    When a coupon is applied, quoted price will differ from course.price — that's expected.
+    //    We only reject if the undiscounted course price has changed since the quote was made.
     const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
     if (!course) throw new NotFoundError("Course not found")
 
-    if (quote.price !== course.price) {
+    const expectedPrice = course.price - (quote.discountAmount ?? 0)
+    if (quote.price !== expectedPrice) {
       throw new ValidationError("Price has changed. Please refresh and try again.")
     }
 
@@ -153,6 +187,8 @@ export class PaymentService {
         provider: this.provider.name,
         providerSessionId: checkoutResult.providerSessionId,
         receipt,
+        couponId: quote.couponId ?? null,
+        discountAmount: quote.discountAmount ?? 0,
       }),
     )
 
@@ -211,6 +247,11 @@ export class PaymentService {
             progressPercent: 0,
           })
           await manager.save(UserCourseProgress, progress)
+        }
+
+        // Increment coupon usage atomically inside the transaction
+        if (payment.couponId && this.couponService) {
+          await this.couponService.incrementUsage(payment.couponId)
         }
       })
 
