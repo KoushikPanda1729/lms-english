@@ -15,7 +15,7 @@ export class Profile {
   @PrimaryColumn({ name: "user_id", type: "uuid" })
   userId!: string
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, (user) => user.profile)
   @JoinColumn({ name: "user_id" })
   user!: User
 

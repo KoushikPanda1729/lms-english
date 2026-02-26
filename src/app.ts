@@ -8,6 +8,7 @@ import { authRouter } from "./modules/auth/auth.routes"
 import { userRouter } from "./modules/users/user.routes"
 import { sessionRouter } from "./modules/sessions/session.routes"
 import { reportRouter, adminRouter } from "./modules/reports/report.routes"
+import { adminUserRouter } from "./modules/admin/admin.routes"
 import { notificationRouter } from "./modules/notifications/notification.routes"
 import { jwksRouter } from "./modules/well-known/jwks.routes"
 import { globalErrorHandler } from "./middleware/error.middleware"
@@ -39,6 +40,9 @@ export function buildApp(container: Container): Application {
     }),
   )
 
+  // ─── App locals (shared across middleware) ───────────────────────────────────
+  app.locals.userRepo = container.userRepo
+
   // ─── Health check ────────────────────────────────────────────────────────────
   app.get("/health", (_req, res) => {
     res.json({
@@ -54,6 +58,7 @@ export function buildApp(container: Container): Application {
   app.use("/sessions", sessionRouter(container.sessionController))
   app.use("/reports", reportRouter(container.reportController))
   app.use("/admin", adminRouter(container.reportController))
+  app.use("/admin", adminUserRouter(container.adminController))
   app.use("/notifications", notificationRouter(container.notificationController))
   app.use("/.well-known", jwksRouter())
 

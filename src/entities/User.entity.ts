@@ -1,5 +1,13 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+} from "typeorm"
 import { UserRole } from "../enums/index"
+import { Profile } from "./Profile.entity"
 
 @Entity("users")
 export class User {
@@ -29,4 +37,7 @@ export class User {
 
   @UpdateDateColumn({ name: "updated_at" })
   updatedAt!: Date
+
+  @OneToOne(() => Profile, (profile) => profile.user)
+  profile!: Profile
 }

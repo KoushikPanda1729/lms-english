@@ -432,6 +432,98 @@
       "name": "Admin",
       "item": [
         {
+          "name": "Get Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "stats"]
+            },
+            "description": "Admin only. Platform-wide stats: totalUsers, bannedUsers, totalSessions, sessionsToday, activeReports."
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "search", "value": "", "disabled": true, "description": "Search by email, displayName or username" },
+                { "key": "isBanned", "value": "false", "disabled": true, "description": "true | false" },
+                { "key": "role", "value": "student", "disabled": true, "description": "student | admin" }
+              ]
+            },
+            "description": "Admin only. Paginated user list with profile and pending report count."
+          }
+        },
+        {
+          "name": "Get User Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}"]
+            },
+            "description": "Admin only. Full user detail including profile, pending report count, total report count."
+          }
+        },
+        {
+          "name": "Ban / Unban User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"banned\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}/ban",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}", "ban"]
+            },
+            "description": "Admin only.\nbanned: true → bans user + revokes all refresh tokens\nbanned: false → unbans user\nCannot ban another admin account."
+          }
+        },
+        {
+          "name": "Set User Role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/users/{{userId}}/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "users", "{{userId}}", "role"]
+            },
+            "description": "Admin only. role: student | admin"
+          }
+        },
+        {
           "name": "Get All Reports",
           "request": {
             "method": "GET",

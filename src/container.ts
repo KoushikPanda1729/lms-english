@@ -16,6 +16,8 @@ import { SessionService } from "./modules/sessions/session.service"
 import { SessionController } from "./modules/sessions/session.controller"
 import { ReportService } from "./modules/reports/report.service"
 import { ReportController } from "./modules/reports/report.controller"
+import { AdminService } from "./modules/admin/admin.service"
+import { AdminController } from "./modules/admin/admin.controller"
 import { NotificationService } from "./modules/notifications/notification.service"
 import { NotificationController } from "./modules/notifications/notification.controller"
 import { createNotificationProvider } from "./modules/notifications/providers/notification-provider.factory"
@@ -66,12 +68,23 @@ export function buildContainer() {
   const reportService = new ReportService(reportRepo, userRepo, refreshTokenRepo)
   const reportController = new ReportController(reportService)
 
+  // ─── Admin ──────────────────────────────────────────────────────────────────
+  const adminService = new AdminService(
+    userRepo,
+    profileRepo,
+    refreshTokenRepo,
+    reportRepo,
+    sessionRepo,
+  )
+  const adminController = new AdminController(adminService)
+
   return {
     authController,
     userController,
     sessionController,
     sessionService,
     reportController,
+    adminController,
     notificationController,
     notificationService,
     userRepo,

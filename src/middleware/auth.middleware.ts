@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express"
+import { Repository } from "typeorm"
 import { verifyAccessToken } from "../modules/auth/jwt.util"
 import { UnauthorizedError } from "../shared/errors"
+import { User } from "../entities/User.entity"
 
 export async function authMiddleware(
   req: Request,
@@ -24,6 +26,16 @@ export async function authMiddleware(
     if (!token) throw new UnauthorizedError("Missing authorization")
 
     const payload = await verifyAccessToken(token)
+
+    // Check ban status — userRepo is set on app.locals in app.ts
+    const userRepo = req.app.locals.userRepo as Repository<User> | undefined
+    if (userRepo) {
+      const user = await userRepo.findOne({
+        where: { id: payload.sub },
+        select: ["id", "isBanned"],
+      })
+      if (user?.isBanned) throw new UnauthorizedError("Account has been suspended")
+    }
 
     req.user = {
       id: payload.sub,
