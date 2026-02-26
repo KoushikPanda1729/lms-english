@@ -1306,7 +1306,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"English for Beginners\",\n  \"description\": \"A complete beginner course to get you started.\",\n  \"level\": \"beginner\",\n  \"isPremium\": false\n}"
+              "raw": "{\n  \"title\": \"English for Beginners\",\n  \"description\": \"A complete beginner course to get you started.\",\n  \"level\": \"beginner\",\n  \"isPremium\": false,\n  \"price\": 49900\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses",
@@ -1318,7 +1318,7 @@
                 "courses"
               ]
             },
-            "description": "Admin only. Creates a course (isPublished=false by default).\nlevel: beginner | intermediate | advanced"
+            "description": "Admin only. Creates a course (isPublished=false by default).\nlevel: beginner | intermediate | advanced\nprice: integer in smallest currency unit (e.g. 49900 = \u20b9499). Required when isPremium is true."
           }
         },
         {
@@ -1337,7 +1337,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Updated Title\",\n  \"isPublished\": true,\n  \"isPremium\": true\n}"
+              "raw": "{\n  \"title\": \"Updated Title\",\n  \"isPublished\": true,\n  \"isPremium\": true,\n  \"price\": 49900\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/admin/courses/{{courseId}}",

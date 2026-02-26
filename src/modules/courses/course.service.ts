@@ -19,6 +19,7 @@ interface CreateCourseDto {
   description?: string | null
   level?: EnglishLevel | null
   isPremium?: boolean
+  price?: number
 }
 
 interface UpdateCourseDto {
@@ -28,6 +29,7 @@ interface UpdateCourseDto {
   level?: EnglishLevel | null
   isPremium?: boolean
   isPublished?: boolean
+  price?: number
 }
 
 interface CreateLessonDto {
@@ -238,6 +240,7 @@ export class CourseService {
       description: dto.description ?? null,
       level: dto.level ?? null,
       isPremium: dto.isPremium ?? false,
+      price: dto.price ?? 0,
       isPublished: false,
       totalLessons: 0,
     })
@@ -256,6 +259,7 @@ export class CourseService {
     if (dto.level !== undefined) course.level = dto.level
     if (dto.isPremium !== undefined) course.isPremium = dto.isPremium
     if (dto.isPublished !== undefined) course.isPublished = dto.isPublished
+    if (dto.price !== undefined) course.price = dto.price
 
     return this.courseRepo.save(course)
   }

@@ -27,6 +27,7 @@ const createCourseSchema = z.object({
   description: z.string().nullable().optional(),
   level: z.nativeEnum(EnglishLevel).nullable().optional(),
   isPremium: z.boolean().optional(),
+  price: z.number().int().min(0).optional(), // smallest currency unit (paise/cents)
 })
 
 const updateCourseSchema = z.object({
@@ -36,6 +37,7 @@ const updateCourseSchema = z.object({
   level: z.nativeEnum(EnglishLevel).nullable().optional(),
   isPremium: z.boolean().optional(),
   isPublished: z.boolean().optional(),
+  price: z.number().int().min(0).optional(), // smallest currency unit (paise/cents)
 })
 
 const createLessonSchema = z.object({
