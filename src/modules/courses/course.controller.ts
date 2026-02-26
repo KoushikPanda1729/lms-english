@@ -106,6 +106,20 @@ export class CourseController {
     if (!uuidRegex.test(id)) throw new ValidationError(`Invalid ${label}`)
   }
 
+  // ─── GET /admin/courses ───────────────────────────────────────────────────────
+
+  async adminListCourses(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = listCoursesSchema.safeParse(req.query)
+      if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
+
+      const result = await this.courseService.adminListCourses(parsed.data)
+      res.json(success(result, "Courses fetched"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
   // ─── GET /courses ─────────────────────────────────────────────────────────────
 
   async listCourses(req: Request, res: Response, next: NextFunction): Promise<void> {

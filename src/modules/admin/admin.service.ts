@@ -4,8 +4,9 @@ import { Profile } from "../../entities/Profile.entity"
 import { RefreshToken } from "../../entities/RefreshToken.entity"
 import { Report } from "../../entities/Report.entity"
 import { CallSession } from "../../entities/CallSession.entity"
-import { UserRole, ReportStatus } from "../../enums/index"
+import { UserRole, ReportStatus, NotificationType } from "../../enums/index"
 import { NotFoundError, ValidationError } from "../../shared/errors"
+import { NotificationService } from "../notifications/notification.service"
 import logger from "../../config/logger"
 
 interface ListUsersFilters {
@@ -29,6 +30,7 @@ export class AdminService {
     private readonly refreshTokenRepo: Repository<RefreshToken>,
     private readonly reportRepo: Repository<Report>,
     private readonly sessionRepo: Repository<CallSession>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   // ─── GET /admin/users ─────────────────────────────────────────────────────────
@@ -175,5 +177,48 @@ export class AdminService {
       ])
 
     return { totalUsers, bannedUsers, totalSessions, sessionsToday, activeReports }
+  }
+
+  // ─── POST /admin/notifications ────────────────────────────────────────────────
+
+  async sendNotification(
+    target: "all" | "user",
+    title: string,
+    body: string,
+    userIds?: string[],
+  ): Promise<{ sent: number }> {
+    const dto = { type: NotificationType.SYSTEM, title, body }
+
+    if (target === "user") {
+      if (!userIds || !userIds.length)
+        throw new ValidationError("userIds is required when target is 'user'")
+
+      // Verify all user IDs exist
+      const users = await this.userRepo
+        .createQueryBuilder("u")
+        .select("u.id")
+        .where("u.id IN (:...ids)", { ids: userIds })
+        .getMany()
+
+      if (!users.length) throw new NotFoundError("No users found for the given IDs")
+
+      await Promise.allSettled(users.map((u) => this.notificationService.sendToUser(u.id, dto)))
+      logger.info(`Admin notification sent to ${users.length} specific user(s)`)
+      return { sent: users.length }
+    }
+
+    // target === 'all' — fetch all user IDs (lightweight, id only)
+    const users = await this.userRepo.find({ select: { id: true } })
+    if (!users.length) return { sent: 0 }
+
+    // Send in batches of 50 to avoid overwhelming the system
+    const BATCH = 50
+    for (let i = 0; i < users.length; i += BATCH) {
+      const batch = users.slice(i, i + BATCH)
+      await Promise.allSettled(batch.map((u) => this.notificationService.sendToUser(u.id, dto)))
+    }
+
+    logger.info(`Admin broadcast notification sent to ${users.length} users`)
+    return { sent: users.length }
   }
 }

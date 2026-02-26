@@ -98,6 +98,30 @@ export class CourseService {
     return { courses: result, total, page, limit }
   }
 
+  // ─── GET /admin/courses ───────────────────────────────────────────────────────
+  // Same as listCourses but includes unpublished courses
+
+  async adminListCourses(filters: ListCoursesFilters): Promise<{
+    courses: Course[]
+    total: number
+    page: number
+    limit: number
+  }> {
+    const { page, limit, level, isPremium } = filters
+
+    const qb = this.courseRepo
+      .createQueryBuilder("c")
+      .orderBy("c.createdAt", "DESC")
+      .skip((page - 1) * limit)
+      .take(limit)
+
+    if (level) qb.andWhere("c.level = :level", { level })
+    if (isPremium !== undefined) qb.andWhere("c.isPremium = :isPremium", { isPremium })
+
+    const [courses, total] = await qb.getManyAndCount()
+    return { courses, total, page, limit }
+  }
+
   // ─── GET /courses/my ──────────────────────────────────────────────────────────
 
   async getMyCourses(

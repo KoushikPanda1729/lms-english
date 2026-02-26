@@ -14,6 +14,7 @@ export function adminUserRouter(controller: AdminController): Router {
   router.get("/users/:id", (req, res, next) => controller.getUserDetail(req, res, next))
   router.patch("/users/:id/ban", (req, res, next) => controller.setUserBanned(req, res, next))
   router.patch("/users/:id/role", (req, res, next) => controller.setUserRole(req, res, next))
+  router.post("/notifications", (req, res, next) => controller.sendNotification(req, res, next))
 
   return router
 }

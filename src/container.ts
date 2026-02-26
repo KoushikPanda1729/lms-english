@@ -105,6 +105,7 @@ export function buildContainer() {
     refreshTokenRepo,
     reportRepo,
     sessionRepo,
+    notificationService,
   )
   const adminController = new AdminController(adminService)
 

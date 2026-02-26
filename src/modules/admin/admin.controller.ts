@@ -22,6 +22,13 @@ const banSchema = z.object({
   banned: z.boolean(),
 })
 
+const sendNotificationSchema = z.object({
+  target: z.enum(["all", "user"]),
+  userIds: z.array(z.string().uuid()).optional(),
+  title: z.string().min(1).max(100),
+  body: z.string().min(1).max(300),
+})
+
 const roleSchema = z.object({
   role: z.nativeEnum(UserRole),
 })
@@ -100,6 +107,21 @@ export class AdminController {
     try {
       const stats = await this.adminService.getStats()
       res.json(success(stats, "Stats fetched"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  // ─── POST /admin/notifications ────────────────────────────────────────────────
+
+  async sendNotification(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = sendNotificationSchema.safeParse(req.body)
+      if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
+
+      const { target, userIds, title, body } = parsed.data
+      const result = await this.adminService.sendNotification(target, title, body, userIds)
+      res.json(success(result, `Notification sent to ${result.sent} user(s)`))
     } catch (err) {
       next(err)
     }
