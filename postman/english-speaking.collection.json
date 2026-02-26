@@ -386,6 +386,94 @@
       ]
     },
     {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Submit Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportedId\": \"{{userId}}\",\n  \"sessionId\": \"{{sessionId}}\",\n  \"reason\": \"harassment\",\n  \"description\": \"User was abusive during the call\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports"]
+            },
+            "description": "reason: harassment | spam | inappropriate | hate_speech | other\nsessionId is optional"
+          }
+        },
+        {
+          "name": "Get My Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/reports/mine?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["reports", "mine"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports?page=1&limit=20&status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reports"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "status", "value": "pending", "description": "pending | reviewed | actioned | dismissed" }
+              ]
+            },
+            "description": "Admin only. Filter by status (optional)."
+          }
+        },
+        {
+          "name": "Update Report (Review / Ban)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"actioned\",\n  \"adminNote\": \"User warned and banned\",\n  \"banReportedUser\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/reports/{{reportId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "reports", "{{reportId}}"]
+            },
+            "description": "Admin only.\nstatus: pending | reviewed | actioned | dismissed\nbanReportedUser: true → sets user.is_banned=true and revokes all refresh tokens"
+          }
+        }
+      ]
+    },
+    {
       "name": "Matchmaking (Socket.io)",
       "description": "Socket.io events — connect to {{socketUrl}} with auth token.\n\nConnect:\n  const socket = io('http://localhost:5503', { auth: { token: 'Bearer <accessToken>' } })\n\nCLIENT → SERVER events:\n  find_partner   { level?: 'beginner'|'intermediate'|'advanced', topic?: string }\n  cancel_search  (no payload)\n\nSERVER → CLIENT events:\n  searching      { estimated_wait_seconds: number }\n  match_found    { roomId, partner: { userId, displayName, avatarUrl, level }, iceServers }\n  peer_left      { reason: 'disconnect' }\n  error          { code, message }",
       "item": [

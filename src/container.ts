@@ -5,12 +5,15 @@ import { PasswordResetToken } from "./entities/PasswordResetToken.entity"
 import { Profile } from "./entities/Profile.entity"
 import { CallSession } from "./entities/CallSession.entity"
 import { SessionRating } from "./entities/SessionRating.entity"
+import { Report } from "./entities/Report.entity"
 import { AuthService } from "./modules/auth/auth.service"
 import { AuthController } from "./modules/auth/auth.controller"
 import { UserService } from "./modules/users/user.service"
 import { UserController } from "./modules/users/user.controller"
 import { SessionService } from "./modules/sessions/session.service"
 import { SessionController } from "./modules/sessions/session.controller"
+import { ReportService } from "./modules/reports/report.service"
+import { ReportController } from "./modules/reports/report.controller"
 import { StorageService } from "./services/storage.service"
 
 export function buildContainer() {
@@ -21,6 +24,7 @@ export function buildContainer() {
   const profileRepo = AppDataSource.getRepository(Profile)
   const sessionRepo = AppDataSource.getRepository(CallSession)
   const ratingRepo = AppDataSource.getRepository(SessionRating)
+  const reportRepo = AppDataSource.getRepository(Report)
 
   // ─── Shared services ────────────────────────────────────────────────────────
   const storageService = new StorageService()
@@ -42,11 +46,16 @@ export function buildContainer() {
   const sessionService = new SessionService(sessionRepo, ratingRepo, profileRepo)
   const sessionController = new SessionController(sessionService)
 
+  // ─── Reports ────────────────────────────────────────────────────────────────
+  const reportService = new ReportService(reportRepo, userRepo, refreshTokenRepo)
+  const reportController = new ReportController(reportService)
+
   return {
     authController,
     userController,
     sessionController,
     sessionService,
+    reportController,
     userRepo,
     profileRepo,
   }
