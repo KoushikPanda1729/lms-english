@@ -6,6 +6,7 @@ import { createRedisClient } from "./config/redis.config"
 import { buildContainer } from "./container"
 import { buildApp } from "./app"
 import { buildMatchmakingGateway } from "./modules/matchmaking/matchmaking.gateway"
+import { buildSignalingGateway } from "./modules/signaling/signaling.gateway"
 import { Config } from "./config/config"
 import logger from "./config/logger"
 
@@ -37,6 +38,9 @@ async function bootstrap() {
 
     buildMatchmakingGateway(io, redis, container.userRepo, container.profileRepo)
     logger.info("Matchmaking gateway ready")
+
+    buildSignalingGateway(io, redis)
+    logger.info("Signaling gateway ready")
 
     // ── Listen ────────────────────────────────────────────────────────────────
     httpServer.listen(Number(Config.PORT), "0.0.0.0", () => {
