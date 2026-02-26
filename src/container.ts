@@ -32,7 +32,7 @@ export function buildContainer() {
   const userService = new UserService(profileRepo, storageService)
   const userController = new UserController(userService)
 
-  return { authController, userController }
+  return { authController, userController, userRepo, profileRepo }
 }
 
 export type Container = ReturnType<typeof buildContainer>

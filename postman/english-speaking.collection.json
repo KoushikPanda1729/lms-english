@@ -328,6 +328,29 @@
           }
         }
       ]
+    },
+    {
+      "name": "Matchmaking (Socket.io)",
+      "description": "Socket.io events — connect to {{socketUrl}} with auth token.\n\nConnect:\n  const socket = io('http://localhost:5503', { auth: { token: 'Bearer <accessToken>' } })\n\nCLIENT → SERVER events:\n  find_partner   { level?: 'beginner'|'intermediate'|'advanced', topic?: string }\n  cancel_search  (no payload)\n\nSERVER → CLIENT events:\n  searching      { estimated_wait_seconds: number }\n  match_found    { roomId, partner: { userId, displayName, avatarUrl, level }, iceServers }\n  peer_left      { reason: 'disconnect' }\n  error          { code, message }",
+      "item": [
+        {
+          "name": "Socket.io Connection Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/socket.io/?EIO=4&transport=polling",
+              "host": ["{{baseUrl}}"],
+              "path": ["socket.io", ""],
+              "query": [
+                { "key": "EIO", "value": "4" },
+                { "key": "transport", "value": "polling" }
+              ]
+            },
+            "description": "Use this to verify the Socket.io server is running.\n\nTo actually test matchmaking, use a Socket.io client in code:\n\nconst { io } = require('socket.io-client')\nconst socket = io('http://localhost:5503', {\n  auth: { token: 'Bearer <accessToken>' }\n})\nsocket.on('connect', () => console.log('connected'))\nsocket.emit('find_partner', { level: 'beginner' })\nsocket.on('match_found', (data) => console.log(data))"
+          }
+        }
+      ]
     }
   ]
 }
