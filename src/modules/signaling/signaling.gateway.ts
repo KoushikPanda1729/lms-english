@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io"
 import { Redis } from "ioredis"
+import { SessionService } from "../sessions/session.service"
 import logger from "../../config/logger"
 
 // ─── Redis key helpers ─────────────────────────────────────────────────────────
@@ -46,7 +47,11 @@ async function assertRoomMember(
 
 // ─── Gateway ───────────────────────────────────────────────────────────────────
 
-export function buildSignalingGateway(io: Server, redis: Redis): void {
+export function buildSignalingGateway(
+  io: Server,
+  redis: Redis,
+  sessionService: SessionService,
+): void {
   io.on("connection", (socket: Socket) => {
     const { userId } = socket.data as SocketData
 
@@ -158,6 +163,11 @@ export function buildSignalingGateway(io: Server, redis: Redis): void {
 
         // Notify the other peer first
         socket.to(`room:${roomId}`).emit("peer_left", { reason: "ended" })
+
+        // End session record in DB (idempotent)
+        sessionService
+          .endSession(roomId, userId)
+          .catch((err) => logger.error("endSession on end_call failed", { error: err, roomId }))
 
         // Clean up all Redis state for this room
         const members = await redis.smembers(keys.roomUsers(roomId))

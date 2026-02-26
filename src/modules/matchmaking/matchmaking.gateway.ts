@@ -6,6 +6,7 @@ import { User } from "../../entities/User.entity"
 import { Profile } from "../../entities/Profile.entity"
 import { verifyAccessToken } from "../auth/jwt.util"
 import { generateTurnCredentials } from "../../utils/turn.util"
+import { SessionService } from "../sessions/session.service"
 import logger from "../../config/logger"
 
 // ─── Redis key helpers ─────────────────────────────────────────────────────────
@@ -63,6 +64,7 @@ export function buildMatchmakingGateway(
   redis: Redis,
   userRepo: Repository<User>,
   profileRepo: Repository<Profile>,
+  sessionService: SessionService,
 ): void {
   // ─── Socket auth middleware ─────────────────────────────────────────────────
 
@@ -154,6 +156,11 @@ export function buildMatchmakingGateway(
             redis.set(keys.userRoom(partnerId), roomId, "EX", ROOM_TTL),
           ])
 
+          // Create DB session record (non-blocking — don't fail the match if DB is slow)
+          sessionService
+            .createSession(roomId, partnerId, userId, level, topic)
+            .catch((err) => logger.error("createSession failed", { error: err, roomId }))
+
           // Fetch both profiles for match_found payload
           const [myProfile, partnerProfile] = await Promise.all([
             profileRepo.findOne({ where: { userId } }),
@@ -224,7 +231,7 @@ export function buildMatchmakingGateway(
         // Remove from queue if still searching
         await cleanupQueue(userId, redis)
 
-        // Notify partner if in a room
+        // Notify partner if in a room and end the session
         const roomId = await redis.get(keys.userRoom(userId))
         if (roomId) {
           const members = await redis.smembers(keys.roomUsers(roomId))
@@ -232,6 +239,11 @@ export function buildMatchmakingGateway(
           if (partnerId) {
             io.to(`user:${partnerId}`).emit("peer_left", { reason: "disconnect" })
           }
+          // End session record (idempotent — safe even if end_call already called)
+          sessionService
+            .endSession(roomId, userId)
+            .catch((err) => logger.error("endSession on disconnect failed", { error: err, roomId }))
+
           await redis.del(keys.userRoom(userId))
         }
 

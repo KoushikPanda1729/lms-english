@@ -6,6 +6,7 @@ import rateLimit from "express-rate-limit"
 import { Config } from "./config/config"
 import { authRouter } from "./modules/auth/auth.routes"
 import { userRouter } from "./modules/users/user.routes"
+import { sessionRouter } from "./modules/sessions/session.routes"
 import { jwksRouter } from "./modules/well-known/jwks.routes"
 import { globalErrorHandler } from "./middleware/error.middleware"
 import type { Container } from "./container"
@@ -48,6 +49,7 @@ export function buildApp(container: Container): Application {
   // ─── Routes ──────────────────────────────────────────────────────────────────
   app.use("/auth", authRouter(container.authController))
   app.use("/users", userRouter(container.userController))
+  app.use("/sessions", sessionRouter(container.sessionController))
   app.use("/.well-known", jwksRouter())
 
   // ─── Global error handler (must be last) ─────────────────────────────────────

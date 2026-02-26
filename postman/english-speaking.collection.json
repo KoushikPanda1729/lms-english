@@ -330,6 +330,62 @@
       ]
     },
     {
+      "name": "Sessions",
+      "item": [
+        {
+          "name": "Get My Call History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Single Session",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Rate Partner",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"stars\": 5\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/rate",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}", "rate"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Matchmaking (Socket.io)",
       "description": "Socket.io events — connect to {{socketUrl}} with auth token.\n\nConnect:\n  const socket = io('http://localhost:5503', { auth: { token: 'Bearer <accessToken>' } })\n\nCLIENT → SERVER events:\n  find_partner   { level?: 'beginner'|'intermediate'|'advanced', topic?: string }\n  cancel_search  (no payload)\n\nSERVER → CLIENT events:\n  searching      { estimated_wait_seconds: number }\n  match_found    { roomId, partner: { userId, displayName, avatarUrl, level }, iceServers }\n  peer_left      { reason: 'disconnect' }\n  error          { code, message }",
       "item": [

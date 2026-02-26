@@ -36,10 +36,16 @@ async function bootstrap() {
       },
     })
 
-    buildMatchmakingGateway(io, redis, container.userRepo, container.profileRepo)
+    buildMatchmakingGateway(
+      io,
+      redis,
+      container.userRepo,
+      container.profileRepo,
+      container.sessionService,
+    )
     logger.info("Matchmaking gateway ready")
 
-    buildSignalingGateway(io, redis)
+    buildSignalingGateway(io, redis, container.sessionService)
     logger.info("Signaling gateway ready")
 
     // ── Listen ────────────────────────────────────────────────────────────────
