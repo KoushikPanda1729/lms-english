@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from "typeorm"
-import { User } from "./User.entity"
+import type { User } from "./User.entity"
 import { EnglishLevel, LearningGoal } from "../enums/index"
 
 @Entity("profiles")
@@ -15,7 +15,7 @@ export class Profile {
   @PrimaryColumn({ name: "user_id", type: "uuid" })
   userId!: string
 
-  @OneToOne(() => User, (user) => user.profile)
+  @OneToOne("User", (user: User) => user.profile)
   @JoinColumn({ name: "user_id" })
   user!: User
 
