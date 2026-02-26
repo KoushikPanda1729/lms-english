@@ -6,6 +6,8 @@ import { Profile } from "./entities/Profile.entity"
 import { CallSession } from "./entities/CallSession.entity"
 import { SessionRating } from "./entities/SessionRating.entity"
 import { Report } from "./entities/Report.entity"
+import { DeviceToken } from "./entities/DeviceToken.entity"
+import { Notification } from "./entities/Notification.entity"
 import { AuthService } from "./modules/auth/auth.service"
 import { AuthController } from "./modules/auth/auth.controller"
 import { UserService } from "./modules/users/user.service"
@@ -14,6 +16,9 @@ import { SessionService } from "./modules/sessions/session.service"
 import { SessionController } from "./modules/sessions/session.controller"
 import { ReportService } from "./modules/reports/report.service"
 import { ReportController } from "./modules/reports/report.controller"
+import { NotificationService } from "./modules/notifications/notification.service"
+import { NotificationController } from "./modules/notifications/notification.controller"
+import { createNotificationProvider } from "./modules/notifications/providers/notification-provider.factory"
 import { StorageService } from "./services/storage.service"
 
 export function buildContainer() {
@@ -25,9 +30,20 @@ export function buildContainer() {
   const sessionRepo = AppDataSource.getRepository(CallSession)
   const ratingRepo = AppDataSource.getRepository(SessionRating)
   const reportRepo = AppDataSource.getRepository(Report)
+  const deviceTokenRepo = AppDataSource.getRepository(DeviceToken)
+  const notificationRepo = AppDataSource.getRepository(Notification)
 
   // ─── Shared services ────────────────────────────────────────────────────────
   const storageService = new StorageService()
+
+  // ─── Notifications (constructed early — needed by AuthController) ────────────
+  const notificationProvider = createNotificationProvider()
+  const notificationService = new NotificationService(
+    deviceTokenRepo,
+    notificationRepo,
+    notificationProvider,
+  )
+  const notificationController = new NotificationController(notificationService)
 
   // ─── Auth ───────────────────────────────────────────────────────────────────
   const authService = new AuthService(
@@ -36,7 +52,7 @@ export function buildContainer() {
     passwordResetTokenRepo,
     AppDataSource,
   )
-  const authController = new AuthController(authService)
+  const authController = new AuthController(authService, notificationService)
 
   // ─── Users ──────────────────────────────────────────────────────────────────
   const userService = new UserService(profileRepo, storageService)
@@ -56,6 +72,8 @@ export function buildContainer() {
     sessionController,
     sessionService,
     reportController,
+    notificationController,
+    notificationService,
     userRepo,
     profileRepo,
   }

@@ -474,6 +474,98 @@
       ]
     },
     {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Register Device Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fcmToken\": \"<fcm_device_token_here>\",\n  \"deviceId\": \"device-001\",\n  \"platform\": \"android\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/device",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "device"]
+            },
+            "description": "Call on every app launch — upserts the FCM token for this device.\nplatform: ios | android"
+          }
+        },
+        {
+          "name": "Unregister Device Token",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceId\": \"device-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/notifications/device",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "device"]
+            },
+            "description": "Call on logout — removes the FCM token for this device only so push stops."
+          }
+        },
+        {
+          "name": "Get My Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20", "description": "max 50" }
+              ]
+            },
+            "description": "Returns paginated notifications for the current user, newest first.\nResponse: { notifications[], total, page, limit }"
+          }
+        },
+        {
+          "name": "Mark All as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/read-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "read-all"]
+            }
+          }
+        },
+        {
+          "name": "Mark Single Notification as Read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/notifications/{{notificationId}}/read",
+              "host": ["{{baseUrl}}"],
+              "path": ["notifications", "{{notificationId}}", "read"]
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "Matchmaking (Socket.io)",
       "description": "Socket.io events — connect to {{socketUrl}} with auth token.\n\nConnect:\n  const socket = io('http://localhost:5503', { auth: { token: 'Bearer <accessToken>' } })\n\nCLIENT → SERVER events:\n  find_partner   { level?: 'beginner'|'intermediate'|'advanced', topic?: string }\n  cancel_search  (no payload)\n\nSERVER → CLIENT events:\n  searching      { estimated_wait_seconds: number }\n  match_found    { roomId, partner: { userId, displayName, avatarUrl, level }, iceServers }\n  peer_left      { reason: 'disconnect' }\n  error          { code, message }",
       "item": [

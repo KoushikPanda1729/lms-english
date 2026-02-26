@@ -64,6 +64,9 @@ const {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 
+  // Notifications
+  NOTIFICATION_PROVIDER,
+
   // Firebase FCM
   FIREBASE_PROJECT_ID,
   FIREBASE_CLIENT_EMAIL,
@@ -145,6 +148,9 @@ export const Config = {
   // Google OAuth
   GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID || "",
   GOOGLE_CLIENT_SECRET: GOOGLE_CLIENT_SECRET || "",
+
+  // Notifications
+  NOTIFICATION_PROVIDER: (NOTIFICATION_PROVIDER || "fcm") as "fcm",
 
   // Firebase
   FIREBASE_PROJECT_ID: FIREBASE_PROJECT_ID || "",

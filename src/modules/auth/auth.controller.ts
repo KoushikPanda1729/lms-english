@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express"
 import { z } from "zod"
 import { AuthService } from "./auth.service"
+import { NotificationService } from "../notifications/notification.service"
 import { Platform } from "../../enums/index"
 import { success } from "../../shared/response"
 import { ValidationError } from "../../shared/errors"
@@ -68,7 +69,10 @@ function clearAuthCookies(res: Response): void {
 // ─── Controller ────────────────────────────────────────────────────────────────
 
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async self(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
@@ -119,7 +123,10 @@ export class AuthController {
   // validateRefreshToken middleware already validated — record is on req.refreshToken
   async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      await this.authService.logout(req.refreshToken!.record)
+      const record = req.refreshToken!.record
+      await this.authService.logout(record)
+      // Remove FCM token for this device so push stops after logout
+      await this.notificationService.unregisterDevice(record.userId, record.deviceId)
       clearAuthCookies(res)
       res.json(success(null, "Logged out successfully"))
     } catch (err) {
