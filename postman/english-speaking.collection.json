@@ -1060,6 +1060,115 @@
       ]
     },
     {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Get Price Quote",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.priceToken) {",
+                  "  pm.environment.set('priceToken', res.data.priceToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/courses/{{courseId}}/quote",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "courses", "{{courseId}}", "quote"]
+            },
+            "description": "Auth required. Step 1 of checkout.\nGenerates a one-time price quote token (10min TTL) tied to the authenticated user.\nReturns: { priceToken, price, currency, expiresIn }\nClient must pass priceToken to the checkout endpoint — never send raw price."
+          }
+        },
+        {
+          "name": "Create Checkout Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.checkoutUrl) {",
+                  "  pm.environment.set('checkoutUrl', res.data.checkoutUrl);",
+                  "  pm.environment.set('paymentSessionId', res.data.sessionId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}", "description": "Client-generated UUID. Reuse on retry, generate new for new attempt." }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"priceToken\": \"{{priceToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/courses/{{courseId}}/checkout",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "courses", "{{courseId}}", "checkout"]
+            },
+            "description": "Auth required. Step 2 of checkout.\nRequires priceToken from the /quote endpoint (one-time use, 10min TTL).\nRequires Idempotency-Key header (UUID) — same key on retry returns cached result.\nReturns: { checkoutUrl, sessionId }\nRedirect user to checkoutUrl to complete payment on Stripe."
+          }
+        },
+        {
+          "name": "Stripe Webhook (reference only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "stripe-signature", "value": "t=...,v1=...", "description": "Set by Stripe automatically" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"type\": \"checkout.session.completed\", \"data\": { \"object\": {} } }"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "webhook"]
+            },
+            "description": "Called by Stripe — NOT by client.\nVerifies stripe-signature HMAC.\nOn checkout.session.completed:\n  1. Validates amountPaid matches DB record\n  2. DB transaction: marks payment paid + enrolls user\n  3. Sends push notification to user\nConfigure this URL in your Stripe Dashboard → Webhooks."
+          }
+        },
+        {
+          "name": "Get Payment History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/history?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["payments", "history"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Auth required. Returns paginated payment history for the current user."
+          }
+        }
+      ]
+    },
+    {
       "name": "WebRTC Signaling (Socket.io)",
       "description": "WebRTC signaling events — uses the same Socket.io connection as Matchmaking.\n\nFLOW:\n  1. Both users receive match_found → get roomId\n  2. Both emit join_room { roomId }\n  3. Server emits peer_joined to both:\n       caller   → create RTCPeerConnection, create offer, emit webrtc_offer\n       receiver → create RTCPeerConnection, wait for offer\n  4. Caller emits webrtc_offer { roomId, sdp }\n  5. Receiver emits webrtc_answer { roomId, sdp }\n  6. Both sides emit webrtc_ice { roomId, candidate } as candidates arrive\n  7. Either side emits end_call { roomId } to terminate\n\nCLIENT → SERVER events:\n  join_room     { roomId }\n  webrtc_offer  { roomId, sdp: RTCSessionDescriptionInit }\n  webrtc_answer { roomId, sdp: RTCSessionDescriptionInit }\n  webrtc_ice    { roomId, candidate: RTCIceCandidateInit }\n  end_call      { roomId }\n\nSERVER → CLIENT events:\n  peer_joined   { role: 'caller'|'receiver', roomId }\n  webrtc_offer  { roomId, sdp }\n  webrtc_answer { roomId, sdp }\n  webrtc_ice    { roomId, candidate }\n  peer_left     { reason: 'ended'|'disconnect' }\n  error         { code, message }",
       "item": [

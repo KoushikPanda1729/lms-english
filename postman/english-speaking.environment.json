@@ -43,6 +43,24 @@
       "value": "",
       "type": "default",
       "enabled": true
+    },
+    {
+      "key": "priceToken",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "checkoutUrl",
+      "value": "",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "paymentSessionId",
+      "value": "",
+      "type": "default",
+      "enabled": true
     }
   ],
   "_postman_variable_scope": "environment",

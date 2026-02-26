@@ -11,6 +11,7 @@ import { reportRouter, adminRouter } from "./modules/reports/report.routes"
 import { adminUserRouter } from "./modules/admin/admin.routes"
 import { courseRouter, adminCourseRouter } from "./modules/courses/course.routes"
 import { notificationRouter } from "./modules/notifications/notification.routes"
+import { paymentRouter } from "./modules/payments/payment.routes"
 import { jwksRouter } from "./modules/well-known/jwks.routes"
 import { globalErrorHandler } from "./middleware/error.middleware"
 import type { Container } from "./container"
@@ -18,20 +19,15 @@ import type { Container } from "./container"
 export function buildApp(container: Container): Application {
   const app = express()
 
-  // ─── Core middleware ─────────────────────────────────────────────────────────
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: true }))
-  app.use(cookieParser())
-
+  // ─── Security middleware — applied FIRST (before all routes including webhook) ─
   app.use(
     cors({
       origin: Config.CORS_ORIGINS.length ? Config.CORS_ORIGINS : "*",
       credentials: true,
     }),
   )
-
   app.use(helmet())
-
+  app.use(cookieParser())
   app.use(
     rateLimit({
       windowMs: 60 * 1000,
@@ -40,6 +36,16 @@ export function buildApp(container: Container): Application {
       legacyHeaders: false,
     }),
   )
+
+  // ─── Stripe webhook — MUST be before express.json() ─────────────────────────
+  // Stripe signature verification requires the raw unparsed body (Buffer).
+  // The /webhook route uses express.raw() inline (see payment.routes.ts).
+  // Other /payments routes use express.json() inline where needed.
+  app.use("/payments", paymentRouter(container.paymentController))
+
+  // ─── Body parsing — after webhook so raw body is preserved ──────────────────
+  app.use(express.json())
+  app.use(express.urlencoded({ extended: true }))
 
   // ─── App locals (shared across middleware) ───────────────────────────────────
   app.locals.userRepo = container.userRepo

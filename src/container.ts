@@ -33,6 +33,11 @@ import { UserQuizAttempt } from "./entities/UserQuizAttempt.entity"
 import { CourseService } from "./modules/courses/course.service"
 import { QuizService } from "./modules/courses/quiz.service"
 import { CourseController } from "./modules/courses/course.controller"
+import { Payment } from "./entities/Payment.entity"
+import { PaymentService } from "./modules/payments/payment.service"
+import { PaymentController } from "./modules/payments/payment.controller"
+import { createPaymentProvider } from "./modules/payments/providers/payment-provider.factory"
+import { getRedisClient } from "./config/redis.config"
 
 export function buildContainer() {
   // ─── Repositories ───────────────────────────────────────────────────────────
@@ -53,11 +58,13 @@ export function buildContainer() {
   const courseProgressRepo = AppDataSource.getRepository(UserCourseProgress)
   const lessonProgressRepo = AppDataSource.getRepository(UserLessonProgress)
   const quizAttemptRepo = AppDataSource.getRepository(UserQuizAttempt)
+  const paymentRepo = AppDataSource.getRepository(Payment)
 
   // ─── Shared services ────────────────────────────────────────────────────────
   const storageService = new StorageService()
+  const redis = getRedisClient()
 
-  // ─── Notifications (constructed early — needed by AuthController) ────────────
+  // ─── Notifications (constructed early — needed by AuthController & PaymentService) ──
   const notificationProvider = createNotificationProvider()
   const notificationService = new NotificationService(
     deviceTokenRepo,
@@ -117,6 +124,19 @@ export function buildContainer() {
   )
   const courseController = new CourseController(courseService, quizService)
 
+  // ─── Payments ───────────────────────────────────────────────────────────────
+  const paymentProvider = createPaymentProvider()
+  const paymentService = new PaymentService(
+    paymentRepo,
+    courseRepo,
+    courseProgressRepo,
+    paymentProvider,
+    AppDataSource,
+    redis,
+    notificationService,
+  )
+  const paymentController = new PaymentController(paymentService)
+
   return {
     authController,
     userController,
@@ -127,6 +147,7 @@ export function buildContainer() {
     notificationController,
     notificationService,
     courseController,
+    paymentController,
     userRepo,
     profileRepo,
   }

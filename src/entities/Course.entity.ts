@@ -29,6 +29,10 @@ export class Course {
   @Column({ name: "is_premium", default: false })
   isPremium!: boolean
 
+  // Price in smallest currency unit (paise for INR, cents for USD). 0 = free.
+  @Column({ type: "int", default: 0 })
+  price!: number
+
   @Column({ name: "is_published", default: false })
   isPublished!: boolean
 
