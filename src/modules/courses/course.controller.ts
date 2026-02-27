@@ -371,6 +371,19 @@ export class CourseController {
     }
   }
 
+  // ─── ADMIN: DELETE /admin/courses/:id ────────────────────────────────────────
+
+  async adminDeleteCourse(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = String(req.params.id)
+      this.validateUuid(id, "course ID")
+      await this.courseService.deleteCourse(id)
+      res.json(success(null, "Course deleted"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
   // ─── ADMIN: DELETE /admin/courses/:id/lessons/:lessonId ──────────────────────
 
   async adminDeleteLesson(req: Request, res: Response, next: NextFunction): Promise<void> {

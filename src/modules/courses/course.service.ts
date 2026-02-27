@@ -380,6 +380,40 @@ export class CourseService {
     return this.lessonRepo.save(lesson)
   }
 
+  // ─── ADMIN: Delete course ─────────────────────────────────────────────────────
+
+  async deleteCourse(courseId: string): Promise<void> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    if (!course) throw new NotFoundError("Course not found")
+
+    // Delete all lesson S3 assets before removing the course
+    const lessons = await this.lessonRepo.find({ where: { courseId } })
+    for (const lesson of lessons) {
+      if (
+        lesson.videoUrl &&
+        !lesson.videoUrl.includes("youtube.com") &&
+        !lesson.videoUrl.includes("youtu.be")
+      ) {
+        await this.storageService
+          .delete(this.storageService.extractKey(lesson.videoUrl))
+          .catch(() => null)
+      }
+      if (lesson.pdfUrl) {
+        await this.storageService
+          .delete(this.storageService.extractKey(lesson.pdfUrl))
+          .catch(() => null)
+      }
+    }
+
+    if (course.thumbnailUrl) {
+      await this.storageService
+        .delete(this.storageService.extractKey(course.thumbnailUrl))
+        .catch(() => null)
+    }
+
+    await this.courseRepo.remove(course)
+  }
+
   // ─── ADMIN: Delete lesson ─────────────────────────────────────────────────────
 
   async deleteLesson(courseId: string, lessonId: string): Promise<void> {

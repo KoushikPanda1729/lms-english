@@ -57,6 +57,7 @@ export function adminCourseRouter(controller: CourseController): Router {
   )
   router.post("/courses", (req, res, next) => controller.adminCreateCourse(req, res, next))
   router.patch("/courses/:id", (req, res, next) => controller.adminUpdateCourse(req, res, next))
+  router.delete("/courses/:id", (req, res, next) => controller.adminDeleteCourse(req, res, next))
   router.post("/courses/:id/thumbnail", upload.single("thumbnail"), (req, res, next) =>
     controller.adminUploadThumbnail(req, res, next),
   )
