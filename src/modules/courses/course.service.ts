@@ -308,6 +308,14 @@ export class CourseService {
 
   // ─── ADMIN: Create lesson ─────────────────────────────────────────────────────
 
+  // ─── ADMIN: List lessons for a course ────────────────────────────────────────
+
+  async listLessons(courseId: string): Promise<Lesson[]> {
+    const course = await this.courseRepo.findOne({ where: { id: courseId } })
+    if (!course) throw new NotFoundError("Course not found")
+    return this.lessonRepo.find({ where: { courseId }, order: { order: "ASC" } })
+  }
+
   async createLesson(courseId: string, dto: CreateLessonDto): Promise<Lesson> {
     const course = await this.courseRepo.findOne({ where: { id: courseId } })
     if (!course) throw new NotFoundError("Course not found")
@@ -368,11 +376,50 @@ export class CourseService {
     return this.lessonRepo.save(lesson)
   }
 
+  // ─── ADMIN: Upload lesson video ───────────────────────────────────────────────
+
+  async uploadLessonVideo(
+    courseId: string,
+    lessonId: string,
+    file: Express.Multer.File,
+  ): Promise<Lesson> {
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    // Delete previous S3 video (skip YouTube/external URLs)
+    if (
+      lesson.videoUrl &&
+      !lesson.videoUrl.includes("youtube.com") &&
+      !lesson.videoUrl.includes("youtu.be")
+    ) {
+      await this.storageService
+        .delete(this.storageService.extractKey(lesson.videoUrl))
+        .catch(() => null)
+    }
+
+    const ext = file.originalname.split(".").pop() ?? "mp4"
+    const key = `courses/${courseId}/lessons/${lessonId}/video-${Date.now()}.${ext}`
+    const url = await this.storageService.upload(key, file.buffer, file.mimetype)
+    lesson.videoUrl = url
+    lesson.type = LessonType.VIDEO
+    return this.lessonRepo.save(lesson)
+  }
+
   // ─── ADMIN: Delete lesson ─────────────────────────────────────────────────────
 
   async deleteLesson(courseId: string, lessonId: string): Promise<void> {
     const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
     if (!lesson) throw new NotFoundError("Lesson not found")
+
+    if (
+      lesson.videoUrl &&
+      !lesson.videoUrl.includes("youtube.com") &&
+      !lesson.videoUrl.includes("youtu.be")
+    ) {
+      await this.storageService
+        .delete(this.storageService.extractKey(lesson.videoUrl))
+        .catch(() => null)
+    }
 
     if (lesson.pdfUrl) {
       await this.storageService

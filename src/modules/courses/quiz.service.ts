@@ -80,6 +80,25 @@ export class QuizService {
     return Object.assign(quiz, { bestAttempt: bestAttempt ?? null })
   }
 
+  // ─── GET /admin/courses/:id/lessons/:lessonId/quiz ────────────────────────────
+  // Admin version — no enrollment check, isCorrect visible
+
+  async getQuizAdmin(courseId: string, lessonId: string): Promise<Quiz> {
+    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
+    if (!lesson) throw new NotFoundError("Lesson not found")
+
+    const quiz = await this.quizRepo.findOne({
+      where: { lessonId },
+      relations: ["questions", "questions.options"],
+    })
+    if (!quiz) throw new NotFoundError("No quiz found for this lesson")
+
+    quiz.questions.sort((a, b) => a.order - b.order)
+    quiz.questions.forEach((q) => q.options.sort((a, b) => (a.id > b.id ? 1 : -1)))
+
+    return quiz
+  }
+
   // ─── POST /courses/:id/lessons/:lessonId/quiz/submit ─────────────────────────
 
   async submitQuiz(

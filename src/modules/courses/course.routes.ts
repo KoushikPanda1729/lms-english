@@ -9,6 +9,11 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB — covers PDFs and thumbnails
 })
 
+const videoUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500 MB for video files
+})
+
 // ─── User routes: mounted at /courses ─────────────────────────────────────────
 
 export function courseRouter(controller: CourseController): Router {
@@ -47,6 +52,9 @@ export function adminCourseRouter(controller: CourseController): Router {
   router.use(adminMiddleware)
 
   router.get("/courses", (req, res, next) => controller.adminListCourses(req, res, next))
+  router.get("/courses/:id/lessons", (req, res, next) =>
+    controller.adminListLessons(req, res, next),
+  )
   router.post("/courses", (req, res, next) => controller.adminCreateCourse(req, res, next))
   router.patch("/courses/:id", (req, res, next) => controller.adminUpdateCourse(req, res, next))
   router.post("/courses/:id/thumbnail", upload.single("thumbnail"), (req, res, next) =>
@@ -62,10 +70,18 @@ export function adminCourseRouter(controller: CourseController): Router {
   router.post("/courses/:id/lessons/:lessonId/pdf", upload.single("pdf"), (req, res, next) =>
     controller.adminUploadLessonPdf(req, res, next),
   )
+  router.post(
+    "/courses/:id/lessons/:lessonId/video",
+    videoUpload.single("video"),
+    (req, res, next) => controller.adminUploadVideo(req, res, next),
+  )
   router.delete("/courses/:id/lessons/:lessonId", (req, res, next) =>
     controller.adminDeleteLesson(req, res, next),
   )
 
+  router.get("/courses/:id/lessons/:lessonId/quiz", (req, res, next) =>
+    controller.adminGetQuiz(req, res, next),
+  )
   router.post("/courses/:id/lessons/:lessonId/quiz", (req, res, next) =>
     controller.adminCreateQuiz(req, res, next),
   )

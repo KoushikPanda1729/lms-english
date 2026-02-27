@@ -106,6 +106,18 @@ export class CourseController {
     if (!uuidRegex.test(id)) throw new ValidationError(`Invalid ${label}`)
   }
 
+  // ─── GET /admin/courses/:id/lessons ──────────────────────────────────────────
+
+  async adminListLessons(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      this.validateUuid(String(req.params.id), "course ID")
+      const lessons = await this.courseService.listLessons(String(req.params.id))
+      res.json(success(lessons, "Lessons fetched"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
   // ─── GET /admin/courses ───────────────────────────────────────────────────────
 
   async adminListCourses(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -342,6 +354,23 @@ export class CourseController {
     }
   }
 
+  // ─── ADMIN: POST /admin/courses/:id/lessons/:lessonId/video ──────────────────
+
+  async adminUploadVideo(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = String(req.params.id)
+      const lessonId = String(req.params.lessonId)
+      this.validateUuid(id, "course ID")
+      this.validateUuid(lessonId, "lesson ID")
+      if (!req.file) throw new ValidationError("No file uploaded")
+
+      const result = await this.courseService.uploadLessonVideo(id, lessonId, req.file)
+      res.json(success(result, "Video uploaded"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
   // ─── ADMIN: DELETE /admin/courses/:id/lessons/:lessonId ──────────────────────
 
   async adminDeleteLesson(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -352,6 +381,21 @@ export class CourseController {
       this.validateUuid(lessonId, "lesson ID")
       await this.courseService.deleteLesson(id, lessonId)
       res.json(success(null, "Lesson deleted"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  // ─── ADMIN: GET /admin/courses/:id/lessons/:lessonId/quiz ────────────────────
+
+  async adminGetQuiz(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = String(req.params.id)
+      const lessonId = String(req.params.lessonId)
+      this.validateUuid(id, "course ID")
+      this.validateUuid(lessonId, "lesson ID")
+      const quiz = await this.quizService.getQuizAdmin(id, lessonId)
+      res.json(success(quiz, "Quiz fetched"))
     } catch (err) {
       next(err)
     }
