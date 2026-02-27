@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io"
 import { Redis } from "ioredis"
 import { v4 as uuidv4 } from "uuid"
 import { Repository } from "typeorm"
+import { parse as parseCookie } from "cookie"
 import { User } from "../../entities/User.entity"
 import { Profile } from "../../entities/Profile.entity"
 import { verifyAccessToken } from "../auth/jwt.util"
@@ -75,7 +76,14 @@ export function buildMatchmakingGateway(
         (socket.handshake.headers?.authorization as string) ||
         ""
 
-      const token = raw.replace(/^Bearer\s+/i, "")
+      let token = raw.replace(/^Bearer\s+/i, "")
+
+      // Fallback: read accessToken from httpOnly cookie (sent automatically by browser)
+      if (!token && socket.handshake.headers?.cookie) {
+        const cookies = parseCookie(socket.handshake.headers.cookie as string)
+        token = cookies.accessToken || ""
+      }
+
       if (!token) return next(new Error("UNAUTHORIZED"))
 
       const payload = await verifyAccessToken(token)

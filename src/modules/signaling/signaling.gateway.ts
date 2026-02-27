@@ -84,19 +84,22 @@ export function buildSignalingGateway(
         // Join the Socket.io room for this call
         socket.join(`room:${roomId}`)
 
-        const existingCaller = await redis.get(keys.caller(roomId))
+        // Atomic SET NX — only one peer can claim "caller"; the other is "receiver"
+        const claimed = await redis.set(keys.caller(roomId), userId, "EX", ROOM_TTL, "NX")
 
-        if (!existingCaller) {
-          // First peer to join — mark as caller and wait silently
-          await redis.set(keys.caller(roomId), userId, "EX", ROOM_TTL)
+        if (claimed === "OK") {
+          // First peer to join — we atomically claimed caller role, wait silently
           logger.debug(`Signaling: ${userId} joined room ${roomId} — waiting for peer`)
         } else {
-          // Second peer joined — room is ready, emit roles to both
-          io.to(`user:${existingCaller}`).emit("peer_joined", { role: "caller", roomId })
-          socket.emit("peer_joined", { role: "receiver", roomId })
-          logger.info(
-            `Signaling: room ready roomId=${roomId} caller=${existingCaller} receiver=${userId}`,
-          )
+          // Second peer joined — fetch caller and emit roles to both
+          const existingCaller = await redis.get(keys.caller(roomId))
+          if (existingCaller) {
+            io.to(`user:${existingCaller}`).emit("peer_joined", { role: "caller", roomId })
+            socket.emit("peer_joined", { role: "receiver", roomId })
+            logger.info(
+              `Signaling: room ready roomId=${roomId} caller=${existingCaller} receiver=${userId}`,
+            )
+          }
         }
       } catch (err) {
         logger.error("join_room error", { error: err, userId })
