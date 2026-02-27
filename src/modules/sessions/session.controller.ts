@@ -15,6 +15,15 @@ const historyQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 })
 
+const adminSessionQuerySchema = z.object({
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+  search: z.string().optional(),
+  level: z.string().optional(),
+  dateFrom: z.string().optional(),
+  dateTo: z.string().optional(),
+})
+
 export class SessionController {
   constructor(private readonly sessionService: SessionService) {}
 
@@ -56,6 +65,34 @@ export class SessionController {
 
       await this.sessionService.rateSession(id, req.user!.id, parsed.data.stars)
       res.json(success(null, "Rating submitted"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  // ─── ADMIN: GET /admin/sessions ───────────────────────────────────────────────
+
+  async adminListSessions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = adminSessionQuerySchema.safeParse(req.query)
+      if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
+
+      const result = await this.sessionService.listSessionsAdmin(parsed.data)
+      res.json(success(result, "Sessions fetched"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  // ─── ADMIN: GET /admin/sessions/:id ──────────────────────────────────────────
+
+  async adminGetSession(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const id = String(req.params.id)
+      if (!uuidRegex.test(id)) throw new ValidationError("Invalid session ID")
+
+      const session = await this.sessionService.getSessionAdmin(id)
+      res.json(success(session, "Session fetched"))
     } catch (err) {
       next(err)
     }

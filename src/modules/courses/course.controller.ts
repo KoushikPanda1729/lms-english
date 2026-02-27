@@ -125,7 +125,7 @@ export class CourseController {
       const parsed = listCoursesSchema.safeParse(req.query)
       if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
 
-      const result = await this.courseService.adminListCourses(parsed.data)
+      const result = await this.courseService.listCourses(parsed.data, { adminMode: true })
       res.json(success(result, "Courses fetched"))
     } catch (err) {
       next(err)
@@ -139,7 +139,7 @@ export class CourseController {
       const parsed = listCoursesSchema.safeParse(req.query)
       if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
 
-      const result = await this.courseService.listCourses(parsed.data, req.user?.id)
+      const result = await this.courseService.listCourses(parsed.data, { userId: req.user?.id })
       res.json(success(result, "Courses fetched"))
     } catch (err) {
       next(err)
@@ -228,7 +228,7 @@ export class CourseController {
       const lessonId = String(req.params.lessonId)
       this.validateUuid(id, "course ID")
       this.validateUuid(lessonId, "lesson ID")
-      const result = await this.quizService.getQuiz(id, lessonId, req.user!.id)
+      const result = await this.quizService.getQuiz(id, lessonId, { userId: req.user!.id })
       res.json(success(result, "Quiz fetched"))
     } catch (err) {
       next(err)
@@ -394,7 +394,7 @@ export class CourseController {
       const lessonId = String(req.params.lessonId)
       this.validateUuid(id, "course ID")
       this.validateUuid(lessonId, "lesson ID")
-      const quiz = await this.quizService.getQuizAdmin(id, lessonId)
+      const quiz = await this.quizService.getQuiz(id, lessonId, { adminMode: true })
       res.json(success(quiz, "Quiz fetched"))
     } catch (err) {
       next(err)

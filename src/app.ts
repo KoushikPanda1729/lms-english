@@ -6,11 +6,14 @@ import rateLimit from "express-rate-limit"
 import { Config } from "./config/config"
 import { authRouter } from "./modules/auth/auth.routes"
 import { userRouter } from "./modules/users/user.routes"
-import { sessionRouter } from "./modules/sessions/session.routes"
+import { sessionRouter, adminSessionRouter } from "./modules/sessions/session.routes"
 import { reportRouter, adminRouter } from "./modules/reports/report.routes"
 import { adminUserRouter } from "./modules/admin/admin.routes"
 import { courseRouter, adminCourseRouter } from "./modules/courses/course.routes"
-import { notificationRouter } from "./modules/notifications/notification.routes"
+import {
+  notificationRouter,
+  adminNotificationRouter,
+} from "./modules/notifications/notification.routes"
 import { paymentRouter } from "./modules/payments/payment.routes"
 import { couponRouter } from "./modules/coupons/coupon.routes"
 import { jwksRouter } from "./modules/well-known/jwks.routes"
@@ -64,10 +67,12 @@ export function buildApp(container: Container): Application {
   app.use("/auth", authRouter(container.authController))
   app.use("/users", userRouter(container.userController))
   app.use("/sessions", sessionRouter(container.sessionController))
+  app.use("/admin", adminSessionRouter(container.sessionController))
   app.use("/reports", reportRouter(container.reportController))
   app.use("/admin", adminRouter(container.reportController))
   app.use("/admin", adminUserRouter(container.adminController))
   app.use("/notifications", notificationRouter(container.notificationController))
+  app.use("/admin", adminNotificationRouter(container.notificationController))
   app.use("/courses", courseRouter(container.courseController))
   app.use("/admin", adminCourseRouter(container.courseController))
   app.use("/admin", couponRouter(container.couponController))

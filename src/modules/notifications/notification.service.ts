@@ -100,6 +100,64 @@ export class NotificationService {
     await this.notificationRepo.update({ userId, read: false }, { read: true, readAt: new Date() })
   }
 
+  // ─── GET /admin/notifications ─────────────────────────────────────────────────
+  // Returns one row per admin broadcast (grouped by title + body + minute bucket)
+
+  async listAdminBroadcasts(
+    page: number,
+    limit: number,
+  ): Promise<{
+    broadcasts: Array<{ title: string; body: string; sentAt: string; recipientCount: number }>
+    total: number
+    page: number
+    limit: number
+  }> {
+    const offset = (page - 1) * limit
+
+    const [broadcasts, countResult] = await Promise.all([
+      this.notificationRepo.manager.query<
+        Array<{ title: string; body: string; sentAt: string; recipientCount: number }>
+      >(
+        `SELECT title, body, MIN(created_at) AS "sentAt", COUNT(*)::int AS "recipientCount"
+         FROM notifications
+         WHERE type = $1
+         GROUP BY title, body, DATE_TRUNC('minute', created_at)
+         ORDER BY MIN(created_at) DESC
+         LIMIT $2 OFFSET $3`,
+        [NotificationType.SYSTEM, limit, offset],
+      ),
+      this.notificationRepo.manager.query<[{ count: string }]>(
+        `SELECT COUNT(*) AS count FROM (
+           SELECT 1 FROM notifications
+           WHERE type = $1
+           GROUP BY title, body, DATE_TRUNC('minute', created_at)
+         ) sub`,
+        [NotificationType.SYSTEM],
+      ),
+    ])
+
+    return {
+      broadcasts: broadcasts.map((r) => ({ ...r, recipientCount: Number(r.recipientCount) })),
+      total: Number(countResult[0]?.count ?? 0),
+      page,
+      limit,
+    }
+  }
+
+  // ─── DELETE /admin/notifications ──────────────────────────────────────────────
+  // Deletes all per-user rows for a given broadcast (matched by title + body + minute)
+
+  async deleteAdminBroadcast(title: string, body: string, sentAt: string): Promise<void> {
+    await this.notificationRepo.manager.query(
+      `DELETE FROM notifications
+       WHERE type = $1
+         AND title = $2
+         AND body = $3
+         AND DATE_TRUNC('minute', created_at) = DATE_TRUNC('minute', $4::timestamptz)`,
+      [NotificationType.SYSTEM, title, body, sentAt],
+    )
+  }
+
   // ─── Send push + save record (called from other services) ─────────────────────
 
   async sendToUser(userId: string, dto: SendNotificationDto): Promise<void> {

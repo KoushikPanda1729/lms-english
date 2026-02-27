@@ -37,23 +37,29 @@ export class QuizService {
     private readonly courseService: CourseService,
   ) {}
 
-  // ─── GET /courses/:id/lessons/:lessonId/quiz ──────────────────────────────────
+  // ─── GET /courses/:id/lessons/:lessonId/quiz  (user + admin) ─────────────────
+  // adminMode = true  → skip isPublished/enrollment checks, expose isCorrect
+  // adminMode = false → enforce published + premium enrollment, hide isCorrect
 
   async getQuiz(
     courseId: string,
     lessonId: string,
-    userId: string,
-  ): Promise<Quiz & { bestAttempt: UserQuizAttempt | null }> {
-    const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
-    if (!course) throw new NotFoundError("Course not found")
+    options: { userId?: string; adminMode?: boolean } = {},
+  ): Promise<Quiz & { bestAttempt?: UserQuizAttempt | null }> {
+    const { userId, adminMode = false } = options
+
+    if (!adminMode) {
+      const course = await this.courseRepo.findOne({ where: { id: courseId, isPublished: true } })
+      if (!course) throw new NotFoundError("Course not found")
+
+      if (course.isPremium) {
+        const enrollment = await this.courseProgressRepo.findOne({ where: { userId, courseId } })
+        if (!enrollment) throw new ForbiddenError("Enroll in this course to access the quiz")
+      }
+    }
 
     const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
     if (!lesson) throw new NotFoundError("Lesson not found")
-
-    if (course.isPremium) {
-      const enrollment = await this.courseProgressRepo.findOne({ where: { userId, courseId } })
-      if (!enrollment) throw new ForbiddenError("Enroll in this course to access the quiz")
-    }
 
     const quiz = await this.quizRepo.findOne({
       where: { lessonId },
@@ -61,42 +67,26 @@ export class QuizService {
     })
     if (!quiz) throw new NotFoundError("Quiz not found for this lesson")
 
-    // Sort questions and options by order
     quiz.questions.sort((a, b) => a.order - b.order)
     quiz.questions.forEach((q) => q.options.sort((a, b) => (a.id > b.id ? 1 : -1)))
 
-    // Hide isCorrect from the response
+    if (adminMode) return quiz
+
+    // Hide isCorrect and attach best attempt for user-facing response
     quiz.questions.forEach((q) =>
       q.options.forEach((o) => {
         delete (o as Partial<QuizOption>).isCorrect
       }),
     )
 
-    const bestAttempt = await this.attemptRepo.findOne({
-      where: { userId, quizId: quiz.id },
-      order: { score: "DESC" },
-    })
+    const bestAttempt = userId
+      ? await this.attemptRepo.findOne({
+          where: { userId, quizId: quiz.id },
+          order: { score: "DESC" },
+        })
+      : null
 
     return Object.assign(quiz, { bestAttempt: bestAttempt ?? null })
-  }
-
-  // ─── GET /admin/courses/:id/lessons/:lessonId/quiz ────────────────────────────
-  // Admin version — no enrollment check, isCorrect visible
-
-  async getQuizAdmin(courseId: string, lessonId: string): Promise<Quiz> {
-    const lesson = await this.lessonRepo.findOne({ where: { id: lessonId, courseId } })
-    if (!lesson) throw new NotFoundError("Lesson not found")
-
-    const quiz = await this.quizRepo.findOne({
-      where: { lessonId },
-      relations: ["questions", "questions.options"],
-    })
-    if (!quiz) throw new NotFoundError("No quiz found for this lesson")
-
-    quiz.questions.sort((a, b) => a.order - b.order)
-    quiz.questions.forEach((q) => q.options.sort((a, b) => (a.id > b.id ? 1 : -1)))
-
-    return quiz
   }
 
   // ─── POST /courses/:id/lessons/:lessonId/quiz/submit ─────────────────────────

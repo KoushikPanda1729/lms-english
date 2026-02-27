@@ -4,6 +4,7 @@ import { Profile } from "../../entities/Profile.entity"
 import { RefreshToken } from "../../entities/RefreshToken.entity"
 import { Report } from "../../entities/Report.entity"
 import { CallSession } from "../../entities/CallSession.entity"
+import { Course } from "../../entities/Course.entity"
 import { UserRole, ReportStatus, NotificationType } from "../../enums/index"
 import { NotFoundError, ValidationError } from "../../shared/errors"
 import { NotificationService } from "../notifications/notification.service"
@@ -31,6 +32,7 @@ export class AdminService {
     private readonly reportRepo: Repository<Report>,
     private readonly sessionRepo: Repository<CallSession>,
     private readonly notificationService: NotificationService,
+    private readonly courseRepo: Repository<Course>,
   ) {}
 
   // ─── GET /admin/users ─────────────────────────────────────────────────────────
@@ -160,23 +162,62 @@ export class AdminService {
     totalSessions: number
     sessionsToday: number
     activeReports: number
+    newUsersThisWeek: number
+    totalCourses: number
+    publishedCourses: number
+    avgSessionMinutes: number
   }> {
     const todayStart = new Date()
     todayStart.setHours(0, 0, 0, 0)
 
-    const [totalUsers, bannedUsers, totalSessions, sessionsToday, activeReports] =
-      await Promise.all([
-        this.userRepo.count(),
-        this.userRepo.count({ where: { isBanned: true } }),
-        this.sessionRepo.count(),
-        this.sessionRepo
-          .createQueryBuilder("s")
-          .where("s.startedAt >= :todayStart", { todayStart })
-          .getCount(),
-        this.reportRepo.count({ where: { status: ReportStatus.PENDING } }),
-      ])
+    const weekAgo = new Date()
+    weekAgo.setDate(weekAgo.getDate() - 7)
 
-    return { totalUsers, bannedUsers, totalSessions, sessionsToday, activeReports }
+    const [
+      totalUsers,
+      bannedUsers,
+      totalSessions,
+      sessionsToday,
+      activeReports,
+      newUsersThisWeek,
+      totalCourses,
+      publishedCourses,
+      avgResult,
+    ] = await Promise.all([
+      this.userRepo.count(),
+      this.userRepo.count({ where: { isBanned: true } }),
+      this.sessionRepo.count(),
+      this.sessionRepo
+        .createQueryBuilder("s")
+        .where("s.startedAt >= :todayStart", { todayStart })
+        .getCount(),
+      this.reportRepo.count({ where: { status: ReportStatus.PENDING } }),
+      this.userRepo
+        .createQueryBuilder("u")
+        .where("u.createdAt >= :weekAgo", { weekAgo })
+        .getCount(),
+      this.courseRepo.count(),
+      this.courseRepo.createQueryBuilder("c").where("c.isPublished = true").getCount(),
+      this.sessionRepo
+        .createQueryBuilder("s")
+        .select("AVG(s.durationSeconds)", "avg")
+        .where("s.durationSeconds IS NOT NULL")
+        .getRawOne<{ avg: string }>(),
+    ])
+
+    const avgSessionMinutes = avgResult?.avg ? Math.round(Number(avgResult.avg) / 60) : 0
+
+    return {
+      totalUsers,
+      bannedUsers,
+      totalSessions,
+      sessionsToday,
+      activeReports,
+      newUsersThisWeek,
+      totalCourses,
+      publishedCourses,
+      avgSessionMinutes,
+    }
   }
 
   // ─── POST /admin/notifications ────────────────────────────────────────────────

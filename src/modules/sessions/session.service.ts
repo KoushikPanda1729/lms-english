@@ -5,6 +5,15 @@ import { Profile } from "../../entities/Profile.entity"
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from "../../shared/errors"
 import logger from "../../config/logger"
 
+interface AdminSessionFilters {
+  page: number
+  limit: number
+  search?: string
+  level?: string
+  dateFrom?: string
+  dateTo?: string
+}
+
 export class SessionService {
   constructor(
     private readonly sessionRepo: Repository<CallSession>,
@@ -113,6 +122,54 @@ export class SessionService {
 
     const rating = this.ratingRepo.create({ sessionId, raterId, ratedId, stars })
     await this.ratingRepo.save(rating)
+  }
+
+  // ─── ADMIN: List all sessions ─────────────────────────────────────────────────
+
+  async listSessionsAdmin(
+    filters: AdminSessionFilters,
+  ): Promise<{ sessions: CallSession[]; total: number; page: number; limit: number }> {
+    const { page, limit, search, level, dateFrom, dateTo } = filters
+
+    const qb = this.sessionRepo
+      .createQueryBuilder("s")
+      .leftJoinAndSelect("s.userA", "ua")
+      .leftJoinAndSelect("s.userB", "ub")
+      .leftJoinAndSelect("ua.profile", "pa")
+      .leftJoinAndSelect("ub.profile", "pb")
+      .orderBy("s.startedAt", "DESC")
+      .skip((page - 1) * limit)
+      .take(limit)
+
+    if (search) {
+      qb.andWhere(
+        "(ua.email ILIKE :s OR ub.email ILIKE :s OR pa.displayName ILIKE :s OR pb.displayName ILIKE :s)",
+        { s: `%${search}%` },
+      )
+    }
+    if (level) qb.andWhere("s.level = :level", { level })
+    if (dateFrom) qb.andWhere("s.startedAt >= :dateFrom", { dateFrom: new Date(dateFrom) })
+    if (dateTo) qb.andWhere("s.startedAt <= :dateTo", { dateTo: new Date(dateTo) })
+
+    const [sessions, total] = await qb.getManyAndCount()
+    return { sessions, total, page, limit }
+  }
+
+  // ─── ADMIN: Get single session with ratings ───────────────────────────────────
+
+  async getSessionAdmin(sessionId: string): Promise<CallSession & { ratings: SessionRating[] }> {
+    const session = await this.sessionRepo.findOne({
+      where: { id: sessionId },
+      relations: ["userA", "userA.profile", "userB", "userB.profile", "endedBy"],
+    })
+    if (!session) throw new NotFoundError("Session not found")
+
+    const ratings = await this.ratingRepo.find({
+      where: { sessionId },
+      relations: ["rater", "rater.profile", "rated", "rated.profile"],
+    })
+
+    return Object.assign(session, { ratings })
   }
 
   // ─── Private: update profile stats after a session ends ───────────────────────

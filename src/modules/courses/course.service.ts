@@ -59,66 +59,41 @@ export class CourseService {
     private readonly storageService: StorageService,
   ) {}
 
-  // ─── GET /courses ─────────────────────────────────────────────────────────────
+  // ─── GET /courses  (public) · GET /admin/courses (admin) ─────────────────────
+  // adminMode = true  → include unpublished, skip enrollment lookup
+  // adminMode = false → published only, attach enrolled flag per userId
 
   async listCourses(
     filters: ListCoursesFilters,
-    userId?: string,
-  ): Promise<{
-    courses: (Course & { enrolled: boolean })[]
-    total: number
-    page: number
-    limit: number
-  }> {
+    options: { adminMode?: boolean; userId?: string } = {},
+  ): Promise<{ courses: Course[]; total: number; page: number; limit: number }> {
     const { page, limit, level, isPremium } = filters
+    const { adminMode = false, userId } = options
 
     const qb = this.courseRepo
       .createQueryBuilder("c")
-      .where("c.isPublished = true")
       .orderBy("c.createdAt", "DESC")
       .skip((page - 1) * limit)
       .take(limit)
 
+    if (!adminMode) qb.where("c.isPublished = true")
     if (level) qb.andWhere("c.level = :level", { level })
     if (isPremium !== undefined) qb.andWhere("c.isPremium = :isPremium", { isPremium })
 
     const [courses, total] = await qb.getManyAndCount()
 
-    // Attach enrollment status
-    let enrolledSet = new Set<string>()
-    if (userId && courses.length > 0) {
-      const enrollments = await this.courseProgressRepo.find({
-        where: courses.map((c) => ({ userId, courseId: c.id })),
-        select: ["courseId"],
-      })
-      enrolledSet = new Set(enrollments.map((e) => e.courseId))
+    if (!adminMode && courses.length > 0) {
+      let enrolledSet = new Set<string>()
+      if (userId) {
+        const enrollments = await this.courseProgressRepo.find({
+          where: courses.map((c) => ({ userId, courseId: c.id })),
+          select: ["courseId"],
+        })
+        enrolledSet = new Set(enrollments.map((e) => e.courseId))
+      }
+      courses.forEach((c) => Object.assign(c, { enrolled: enrolledSet.has(c.id) }))
     }
 
-    const result = courses.map((c) => Object.assign(c, { enrolled: enrolledSet.has(c.id) }))
-    return { courses: result, total, page, limit }
-  }
-
-  // ─── GET /admin/courses ───────────────────────────────────────────────────────
-  // Same as listCourses but includes unpublished courses
-
-  async adminListCourses(filters: ListCoursesFilters): Promise<{
-    courses: Course[]
-    total: number
-    page: number
-    limit: number
-  }> {
-    const { page, limit, level, isPremium } = filters
-
-    const qb = this.courseRepo
-      .createQueryBuilder("c")
-      .orderBy("c.createdAt", "DESC")
-      .skip((page - 1) * limit)
-      .take(limit)
-
-    if (level) qb.andWhere("c.level = :level", { level })
-    if (isPremium !== undefined) qb.andWhere("c.isPremium = :isPremium", { isPremium })
-
-    const [courses, total] = await qb.getManyAndCount()
     return { courses, total, page, limit }
   }
 

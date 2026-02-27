@@ -95,4 +95,44 @@ export class NotificationController {
       next(err)
     }
   }
+
+  // ─── GET /admin/notifications ──────────────────────────────────────────────────
+
+  async adminListNotifications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const parsed = paginationSchema.safeParse(req.query)
+      if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
+
+      const result = await this.notificationService.listAdminBroadcasts(
+        parsed.data.page,
+        parsed.data.limit,
+      )
+      res.json(success(result, "Broadcast history fetched"))
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  // ─── DELETE /admin/notifications ───────────────────────────────────────────────
+
+  async adminDeleteBroadcast(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const schema = z.object({
+        title: z.string().min(1),
+        body: z.string().min(1),
+        sentAt: z.string().min(1),
+      })
+      const parsed = schema.safeParse(req.body)
+      if (!parsed.success) throw new ValidationError(parsed.error.errors[0].message)
+
+      await this.notificationService.deleteAdminBroadcast(
+        parsed.data.title,
+        parsed.data.body,
+        parsed.data.sentAt,
+      )
+      res.json(success(null, "Broadcast deleted"))
+    } catch (err) {
+      next(err)
+    }
+  }
 }
